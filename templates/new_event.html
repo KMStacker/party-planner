@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block title %}Party Planner - New Event{% endblock %}
+
+{% block content %}
+<h2>Create a New Event</h2>
+
+<form action="/create_event" method="post">
+  <p>
+    <label for="title">Title:</label><br>
+    <input type="text" name="title" id="title" required maxlength="50">
+  </p>
+  <p>
+    <label for="description">Description:</label><br>
+    <textarea name="description" id="description" rows="5" cols="40" required maxlength="1000"></textarea>
+  </p>
+  <p>
+    <label for="event_date">Date:</label><br>
+    <input type="date" name="event_date" id="event_date" required>
+  </p>
+  <p>
+    <label>Categories:</label><br>
+    {% for category in categories %}
+      <input type="checkbox" name="categories" value="{{ category.id }}" id="cat_{{ category.id }}">
+      <label for="cat_{{ category.id }}">{{ category.name }}</label><br>
+    {% endfor %}
+  </p>
+  <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+  <input type="submit" value="Create Event">
+</form>
+{% endblock %}

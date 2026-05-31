@@ -1,0 +1,217 @@
+import sqlite3
+import secrets
+from flask import Flask, render_template, request, redirect, flash, session, abort
+import config
+import events
+import users
+
+app = Flask(__name__)
+app.secret_key = config.secret_key
+
+@app.route("/")
+def index():
+    keyword = request.args.get("keyword", "")
+    category_id = request.args.get("category_id", "")
+    event_date = request.args.get("event_date", "")
+
+    if keyword or category_id or event_date:
+        all_events = events.search_events(keyword, category_id, event_date)
+    else:
+        all_events = events.get_events()
+        
+    all_categories = events.get_categories()
+    
+    return render_template("index.html", 
+                           events=all_events, 
+                           categories=all_categories,
+                           keyword=keyword,
+                           selected_category=category_id,
+                           event_date=event_date)
+
+@app.route("/register")
+def register():
+    return render_template("register.html")
+
+@app.route("/create", methods=["POST"])
+def create():
+    username = request.form["username"]
+    password1 = request.form["password1"]
+    password2 = request.form["password2"]
+    
+    if password1 != password2:
+        flash("ERROR: Passwords do not match")
+        return redirect("/register")
+
+    try:
+        users.create_user(username, password1)
+    except sqlite3.IntegrityError:
+        flash("ERROR: Username is already taken")
+        return redirect("/register")
+
+    return redirect("/")
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "GET":
+        return render_template("login.html")
+
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        user_id = users.check_login(username, password)
+        
+        if user_id:
+            session["user_id"] = user_id
+            session["username"] = username
+            session["csrf_token"] = secrets.token_hex(16)
+            return redirect("/")
+        else:
+            flash("ERROR: Wrong username or password")
+            return redirect("/login")
+
+@app.route("/logout")
+def logout():
+    if "user_id" in session:
+        del session["user_id"]
+        del session["username"]
+        if "csrf_token" in session:
+            del session["csrf_token"]
+    return redirect("/")
+
+def require_login():
+    if "user_id" not in session:
+        abort(403)
+
+def check_csrf():
+    if "csrf_token" not in request.form:
+        abort(403)
+    if request.form["csrf_token"] != session["csrf_token"]:
+        abort(403)
+
+@app.route("/event/new")
+def new_event():
+    require_login()
+    categories = events.get_categories()
+    return render_template("new_event.html", categories=categories)
+
+@app.route("/create_event", methods=["POST"])
+def create_event():
+    require_login()
+    check_csrf()
+
+    title = request.form["title"]
+    description = request.form["description"]
+    event_date = request.form["event_date"]
+    category_ids = request.form.getlist("categories")
+
+    events.create_event(session["user_id"], title, description, event_date, category_ids)
+
+    return redirect("/")
+
+@app.route("/event/<int:id>")
+def show_event(id):
+    event = events.get_event(id)
+    if not event:
+        abort(404)
+        
+    categories = events.get_event_categories(id)
+    rsvps = events.get_rsvps(id)
+    
+    return render_template("event.html", event=event, categories=categories, rsvps=rsvps)
+
+@app.route("/rsvp", methods=["POST"])
+def rsvp():
+    require_login()
+    check_csrf()
+    
+    event_id = request.form["event_id"]
+    status = request.form["status"]
+    
+    events.add_rsvp(event_id, session["user_id"], status)
+    
+    return redirect("/event/" + str(event_id))
+
+@app.route("/event/<int:id>/edit")
+def edit_event(id):
+    require_login()
+    event = events.get_event(id)
+    
+    if not event or event["user_id"] != session["user_id"]:
+        abort(403)
+        
+    categories = events.get_categories()
+    event_cats = events.get_event_categories(id)
+    event_category_ids = [cat["id"] for cat in event_cats]
+    
+    return render_template("edit_event.html", event=event, categories=categories, event_category_ids=event_category_ids)
+
+@app.route("/event/<int:id>/update", methods=["POST"])
+def update_event(id):
+    require_login()
+    check_csrf()
+    
+    event = events.get_event(id)
+    if not event or event["user_id"] != session["user_id"]:
+        abort(403)
+        
+    title = request.form["title"]
+    description = request.form["description"]
+    event_date = request.form["event_date"]
+    category_ids = request.form.getlist("categories")
+    
+    events.update_event(id, title, description, event_date, category_ids)
+    return redirect("/event/" + str(id))
+
+@app.route("/event/<int:id>/delete", methods=["POST"])
+def delete_event(id):
+    require_login()
+    check_csrf()
+    
+    event = events.get_event(id)
+    if not event or event["user_id"] != session["user_id"]:
+        abort(403)
+        
+    events.delete_event(id)
+    return redirect("/")
+
+@app.route("/user/<int:id>")
+def user_profile(id):
+    user = users.get_user_profile(id)
+    if not user:
+        abort(404)
+        
+    stats = users.get_user_stats(id)
+    user_events = users.get_user_events(id)
+    user_dates = users.get_user_dates(id)
+    
+    return render_template("profile.html", user=user, stats=stats, user_events=user_events, user_dates=user_dates)
+
+@app.route("/profile/update_status", methods=["POST"])
+def profile_status():
+    require_login()
+    check_csrf()
+    
+    status = request.form["status"]
+    users.update_status(session["user_id"], status)
+
+    return redirect("/user/" + str(session["user_id"]))
+
+@app.route("/profile/add_date", methods=["POST"])
+def profile_add_date():
+    require_login()
+    check_csrf()
+    
+    date_text = request.form["date_text"]
+    status = request.form["status"]
+    
+    users.add_user_date(session["user_id"], date_text, status)
+    return redirect("/user/" + str(session["user_id"]))
+
+@app.route("/profile/delete_date/<int:date_id>", methods=["POST"])
+def profile_delete_date(date_id):
+    require_login()
+    check_csrf()
+    
+    users.delete_user_date(date_id, session["user_id"])
+    return redirect("/user/" + str(session["user_id"]))

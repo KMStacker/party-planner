@@ -1,0 +1,29 @@
+{% import "icons.html" as icons %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Party Planner{% endblock %}</title>
+    <link rel="stylesheet" href="/static/main.css">
+</head>
+<body>
+    <header>
+        <h1>Party Planner</h1>
+        <nav>
+            <a href="/">Home</a> | 
+            
+            {% if session.user_id %}
+                <a href="/event/new">New Event</a> |
+                <a href="/user/{{ session.user_id }}">{{ icons.user() }} My Profile ({{ session.username }})</a> |
+                <a href="/logout">Logout</a>
+            {% else %}
+                <a href="/login">Login</a> | 
+                <a href="/register">Register</a>
+            {% endif %}
+        </nav>
+    </header>
+    
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

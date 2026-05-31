@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+{% import "icons.html" as icons %}
+
+{% block title %}Party Planner - Home{% endblock %}
+
+{% block content %}
+<h2>Search Events</h2>
+
+<form action="/" method="get" class="search-form">
+  <div class="search-row">
+    
+    <div class="search-field field-keyword">
+      <label>Keyword:</label>
+      <input type="text" name="keyword" value="{{ keyword }}" placeholder="Search...">
+    </div>
+
+    <div class="search-field field-category">
+      <label>Category:</label>
+      <select name="category_id">
+        <option value="">All Categories</option>
+        {% for category in categories %}
+          <option value="{{ category.id }}" {% if category.id|string == selected_category %}selected{% endif %}>{{ category.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="search-field field-date">
+      <label>Date:</label>
+      <input type="date" name="event_date" value="{{ event_date }}">
+    </div>
+
+    <div>
+      <input type="submit" class="btn btn-primary" value="Search">
+      {% if keyword or selected_category or event_date %}
+        <a href="/" class="btn btn-clear">Clear</a>
+      {% endif %}
+    </div>
+
+  </div>
+</form>
+
+<h2>Upcoming Events</h2>
+
+{% if events %}
+    <ul>
+    {% for event in events %}
+        <li>
+            <a href="/event/{{ event.id }}"><strong>{{ event.title }}</strong></a>
+            <div class="icon-row" style="margin-top: 8px;">
+                {{ icons.calendar() }}
+                <span>{{ event.event_date }}</span>
+            </div>
+            <div class="icon-row">
+                {{ icons.user() }}
+                <span>Organized by: <a href="/user/{{ event.user_id }}"><strong>{{ event.username }}</strong></a></span>
+            </div>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No events planned yet!</p>
+{% endif %}
+{% endblock %}
