@@ -268,3 +268,13 @@ select {
     border-radius: 8px;
     border: 1px solid #d7dee8;
 }
+
+.flash-error {
+    background-color: #f9e4e4;
+    color: #941a1a;
+    border: 1px solid #fea4a4;
+    padding: 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
