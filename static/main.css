@@ -269,12 +269,25 @@ select {
     border: 1px solid #d7dee8;
 }
 
-.flash-error {
-    background-color: #f9e4e4;
-    color: #941a1a;
-    border: 1px solid #fea4a4;
+.flash-messages {
+    margin-bottom: 20px;
+}
+
+.flash-message {
     padding: 12px;
     border-radius: 6px;
     font-weight: 600;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
+}
+
+.flash-message.error {
+    background-color: #f9e4e4;
+    color: #941a1a;
+    border: 1px solid #fea4a4;
+}
+
+.flash-message.success {
+    background-color: #e1fbea;
+    color: #155c31;
+    border: 1px solid #8df6b4;
 }

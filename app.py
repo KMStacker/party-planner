@@ -39,13 +39,13 @@ def create():
     password2 = request.form["password2"]
     
     if password1 != password2:
-        flash("ERROR: Passwords do not match")
+        flash("Passwords do not match", "error")
         return redirect("/register")
 
     try:
         users.create_user(username, password1)
     except sqlite3.IntegrityError:
-        flash("ERROR: Username is already taken")
+        flash("Username is already taken", "error")
         return redirect("/register")
 
     return redirect("/")
@@ -67,7 +67,7 @@ def login():
             session["csrf_token"] = secrets.token_hex(16)
             return redirect("/")
         else:
-            flash("ERROR: Wrong username or password")
+            flash("Wrong username or password", "error")
             return redirect("/login")
 
 @app.route("/logout")
