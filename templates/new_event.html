@@ -8,20 +8,21 @@
 <form action="/create_event" method="post">
   <p>
     <label for="title">Title:</label><br>
-    <input type="text" name="title" id="title" required maxlength="50">
+    <input type="text" name="title" id="title" required maxlength="50" value="{{ title or '' }}">
   </p>
   <p>
     <label for="description">Description:</label><br>
-    <textarea name="description" id="description" rows="5" cols="40" required maxlength="1000"></textarea>
+    <textarea name="description" id="description" rows="5" cols="40" required maxlength="1000">{{ description or '' }}</textarea>
   </p>
   <p>
     <label for="event_date">Date:</label><br>
-    <input type="date" name="event_date" id="event_date" required>
+    <input type="date" name="event_date" id="event_date" required value="{{ event_date or '' }}">
   </p>
   <p>
     <label>Categories:</label><br>
     {% for category in categories %}
       <input type="checkbox" name="categories" value="{{ category.id }}" id="cat_{{ category.id }}">
+        {% if event_category_ids and category.id in event_category_ids %}checked{% endif %}>
       <label for="cat_{{ category.id }}">{{ category.name }}</label><br>
     {% endfor %}
   </p>

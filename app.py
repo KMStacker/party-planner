@@ -1,5 +1,6 @@
 import sqlite3
 import secrets
+from datetime import date
 from flask import Flask, render_template, request, redirect, flash, session, abort
 import config
 import events
@@ -100,10 +101,23 @@ def create_event():
     require_login()
     check_csrf()
 
-    title = request.form["title"]
-    description = request.form["description"]
+    title = request.form["title"].strip()
+    description = request.form["description"].strip()
     event_date = request.form["event_date"]
     category_ids = request.form.getlist("categories")
+
+    today = date.today().isoformat()
+    int_category_ids = [int(cid) for cid in category_ids if cid.isdigit()]
+
+    if not title or not description or not event_date:
+        flash("Title, description, and event date cannot be empty or contain only spaces", "error")
+        categories = events.get_categories()
+        return render_template("new_event.html", categories=categories, title=title, description=description, event_date=event_date, event_category_ids=int_category_ids)
+
+    if event_date < today:
+        flash("Event date cannot be in the past", "error")
+        categories = events.get_categories()
+        return render_template("new_event.html", categories=categories, title=title, description=description, event_date=event_date, event_category_ids=int_category_ids)
 
     events.create_event(session["user_id"], title, description, event_date, category_ids)
 
@@ -155,11 +169,26 @@ def update_event(id):
     if not event or event["user_id"] != session["user_id"]:
         abort(403)
         
-    title = request.form["title"]
-    description = request.form["description"]
+    title = request.form["title"].strip()
+    description = request.form["description"].strip()
     event_date = request.form["event_date"]
     category_ids = request.form.getlist("categories")
     
+    today = date.today().isoformat()
+    int_category_ids = [int(cid) for cid in category_ids if cid.isdigit()]
+
+    if not title or not description or not event_date:
+        flash("Title, description, and event date cannot be empty or contain only spaces", "error")
+        categories = events.get_categories()
+        updating_event = {"id": id, "title": title, "description": description, "event_date": event_date}
+        return render_template("edit_event.html", event=updating_event, categories=categories, event_category_ids=int_category_ids)
+
+    if event_date < today:
+        flash("Event date cannot be in the past", "error")
+        categories = events.get_categories()
+        updating_event = {"id": id, "title": title, "description": description, "event_date": event_date}
+        return render_template("edit_event.html", event=updating_event, categories=categories, event_category_ids=int_category_ids)
+
     events.update_event(id, title, description, event_date, category_ids)
     return redirect("/event/" + str(id))
 
