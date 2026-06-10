@@ -36,3 +36,17 @@ Käynnistä sovellus:
 ```
 $ flask run
 ```
+
+## Koodin laatu
+
+Jos haluat tarkistaa koodin laadun Pylint-työkalulla, asenna se ensin komennolla:
+
+```
+$ pip install pylint
+```
+
+Sen jälkeen voit tarkastaa koodin laadun komennolla:
+
+```
+$ pylint app.py config.py db.py events.py users.py
+```
