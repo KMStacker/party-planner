@@ -1,3 +1,3 @@
-import secrets
+import os
 
-secret_key = secrets.token_hex(16)
+secret_key = os.environ.get("SECRET_KEY", "key_for_local_use_1234")
