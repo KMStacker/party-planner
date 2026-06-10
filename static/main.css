@@ -291,3 +291,8 @@ select {
     color: #155c31;
     border: 1px solid #8df6b4;
 }
+
+.event-description {
+    white-space: pre-line;
+}
+
