@@ -48,5 +48,5 @@ $ pip install pylint
 Sen jälkeen voit tarkastaa koodin laadun komennolla:
 
 ```
-$ pylint app.py config.py db.py events.py users.py
+$ pylint *.py
 ```
