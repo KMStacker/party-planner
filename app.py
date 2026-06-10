@@ -35,19 +35,23 @@ def register():
 
 @app.route("/create", methods=["POST"])
 def create():
-    username = request.form["username"]
+    username = request.form["username"].strip()
     password1 = request.form["password1"]
     password2 = request.form["password2"]
     
+    if not username:
+        flash("Username cannot be empty or contain only spaces", "error")
+        return render_template("register.html", username=username)
+    
     if password1 != password2:
         flash("Passwords do not match", "error")
-        return redirect("/register")
+        return render_template("register.html", username=username)
 
     try:
         users.create_user(username, password1)
     except sqlite3.IntegrityError:
         flash("Username is already taken", "error")
-        return redirect("/register")
+        return render_template("register.html", username=username)
 
     return redirect("/")
 
@@ -57,7 +61,7 @@ def login():
         return render_template("login.html")
 
     if request.method == "POST":
-        username = request.form["username"]
+        username = request.form["username"].strip()
         password = request.form["password"]
 
         user_id = users.check_login(username, password)
@@ -69,7 +73,7 @@ def login():
             return redirect("/")
         else:
             flash("Wrong username or password", "error")
-            return redirect("/login")
+            return render_template("login.html", username=username)
 
 @app.route("/logout")
 def logout():
