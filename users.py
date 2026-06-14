@@ -44,13 +44,18 @@ def get_user_events(user_id):
     return db.query(sql, [user_id])
 
 def get_user_dates(user_id):
-    sql = "SELECT id, date_text, status FROM user_dates WHERE user_id = ? ORDER BY date_text ASC"
+    sql = "SELECT id, start_date, end_date, date_status FROM user_availability WHERE user_id = ? ORDER BY start_date ASC"
     return db.query(sql, [user_id])
 
-def add_user_date(user_id, date_text, status):
-    sql = "INSERT INTO user_dates (user_id, date_text, status) VALUES (?, ?, ?)"
-    db.execute(sql, [user_id, date_text, status])
+def add_user_availability(user_id, start_date, end_date, date_status):
+    sql = "INSERT INTO user_availability (user_id, start_date, end_date, date_status) VALUES (?, ?, ?, ?)"
+    db.execute(sql, [user_id, start_date, end_date, date_status])
 
 def delete_user_date(date_id, user_id):
-    sql = "DELETE FROM user_dates WHERE id = ? AND user_id = ?"
+    sql = "DELETE FROM user_availability WHERE id = ? AND user_id = ?"
     db.execute(sql, [date_id, user_id])
+
+def overlapping_date_status(user_id, start_date, end_date):
+    sql = "SELECT 1 FROM user_availability WHERE user_id = ? AND start_date <= ? AND end_date >= ?"
+    result = db.query(sql, [user_id, end_date, start_date])
+    return len(result) > 0

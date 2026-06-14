@@ -38,10 +38,11 @@ CREATE TABLE rsvps (
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
-CREATE TABLE user_dates (
+CREATE TABLE user_availability (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
-    date_text TEXT NOT NULL,
-    status TEXT NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users (id)
+    start_date TEXT NOT NULL,
+    end_date TEXT NOT NULL,
+    date_status TEXT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );

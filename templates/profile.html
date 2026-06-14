@@ -55,9 +55,15 @@
                     <div class="icon-row">
                         {{ icons.calendar() }}
                         <span>
-                            <strong>{{ d.date_text }}</strong> - 
-                            <span class="{% if d.status == 'Available' %}status-available{% else %}status-unavailable{% endif %}">
-                                {{ d.status }}
+                            <strong>
+                                {% if d.start_date == d.end_date %}
+                                    {{ d.start_date }}
+                                {% else %}
+                                    From {{ d.start_date }} to {{ d.end_date }}
+                                {% endif %}
+                            </strong> -
+                            <span class="{% if d.date_status == 'Available' %}status-available{% else %}status-unavailable{% endif %}">
+                                {{ d.date_status }}
                             </span>
                         </span>
                     </div>
@@ -76,10 +82,11 @@
     {% endif %}
 
     {% if session.user_id == user.id %}
-        <h4 style="margin-top: 20px; margin-bottom: 5px;">Add Date:</h4>
+        <h4 style="margin-top: 20px; margin-bottom: 5px;">Add Availability Date:</h4>
         <form action="/profile/add_date" method="post" class="inline-form">
-            <input type="date" name="date_text" required>
-            <select name="status">
+            <input type="date" name="start_date_string" required>
+            <input type="date" name="end_date_string">
+            <select name="date_status">
                 <option value="Available">Available</option>
                 <option value="Unavailable">Unavailable</option>
             </select>

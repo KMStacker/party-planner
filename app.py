@@ -1,6 +1,6 @@
 import sqlite3
 import secrets
-from datetime import date
+from datetime import date, datetime, timedelta
 from flask import Flask, render_template, request, redirect, flash, session, abort
 import config
 import events
@@ -256,10 +256,30 @@ def profile_add_date():
     require_login()
     check_csrf()
     
-    date_text = request.form["date_text"]
-    status = request.form["status"]
+    start_date_string = request.form["start_date_string"]
+    end_date_string = request.form["end_date_string"]
+    date_status = request.form["date_status"]
     
-    users.add_user_date(session["user_id"], date_text, status)
+    try:
+        start_date = datetime.strptime(start_date_string, "%Y-%m-%d").date()
+        if end_date_string:
+            end_date = datetime.strptime(end_date_string, "%Y-%m-%d").date()
+            if end_date < start_date:
+                flash("End date cannot be before start date.", "error")
+                return redirect("/user/" + str(session["user_id"]))
+        else:
+            end_date = start_date
+    except ValueError:
+        flash("Invalid date format. Please use YYYY-MM-DD and/or real dates.", "error")
+        return redirect("/user/" + str(session["user_id"]))
+    
+    end_date_string = end_date_string if end_date_string else start_date_string
+
+    if users.overlapping_date_status(session["user_id"], start_date_string, end_date_string):
+        flash("The new date range overlaps with an existing one. Please adjust the dates.", "error")
+        return redirect("/user/" + str(session["user_id"]))
+
+    users.add_user_availability(session["user_id"], start_date_string, end_date_string, date_status)
     return redirect("/user/" + str(session["user_id"]))
 
 @app.route("/profile/delete_date/<int:date_id>", methods=["POST"])
