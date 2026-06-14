@@ -157,7 +157,7 @@ select {
 }
 
 .btn-primary {
-    background-color: #3096da;
+    background-color: #1f6da1;
     color: white;
 }
 
@@ -197,14 +197,14 @@ select {
 .profile-status-text {
     font-size: 1.2rem;
     font-style: italic;
-    color: #3fa1e2;
+    color: #266b98;
 }
 
 .stats-card {
     display: flex;
     gap: 30px;
-    background: #dce2f3;
-    border: 1px solid #b5c0ef;
+    background: #e9ecf6;
+    border: 1px solid #b7c2f3;
     border-radius: 8px;
     padding: 15px 20px;
     margin-bottom: 20px;

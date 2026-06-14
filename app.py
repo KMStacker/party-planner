@@ -44,7 +44,7 @@ def create():
         return render_template("register.html", username=username)
     
     if len(username) < 3 or len(username) > 20:
-        flash("Username length range is 3-20 characters", "error")
+        flash("Username length range is 3-20 characters without spaces", "error")
         return render_template("register.html", username=username)
 
     if password1 != password2:
@@ -148,9 +148,9 @@ def rsvp():
     check_csrf()
     
     event_id = request.form["event_id"]
-    status = request.form["status"]
+    rsvp_status = request.form["rsvp_status"]
     
-    events.add_rsvp(event_id, session["user_id"], status)
+    events.add_rsvp(event_id, session["user_id"], rsvp_status)
     
     return redirect("/event/" + str(event_id))
 
@@ -229,9 +229,26 @@ def profile_status():
     require_login()
     check_csrf()
     
-    status = request.form["status"]
+    status = request.form["status"].strip()
+
+    if not status:
+        flash("Status cannot be empty or contain only spaces", "error")
+        return redirect("/user/" + str(session["user_id"]))
+        
+    if len(status) < 2 or len(status) > 250:
+        flash("Status length range is 2-250 characters without spaces", "error")
+        return redirect("/user/" + str(session["user_id"]))
+    
     users.update_status(session["user_id"], status)
 
+    return redirect("/user/" + str(session["user_id"]))
+
+@app.route("/profile/delete_status", methods=["POST"])
+def profile_delete_status():
+    require_login()
+    check_csrf()
+    
+    users.update_status(session["user_id"], None)
     return redirect("/user/" + str(session["user_id"]))
 
 @app.route("/profile/add_date", methods=["POST"])
