@@ -43,6 +43,10 @@ def create():
         flash("Username cannot be empty or contain only spaces", "error")
         return render_template("register.html", username=username)
     
+    if len(username) < 3 or len(username) > 20:
+        flash("Username length range is 3-20 characters", "error")
+        return render_template("register.html", username=username)
+
     if password1 != password2:
         flash("Passwords do not match", "error")
         return render_template("register.html", username=username)
