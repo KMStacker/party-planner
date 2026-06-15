@@ -14,16 +14,22 @@ def get_categories():
     return db.query(sql)
 
 def create_event(user_id, title, description, event_date, category_ids):
-    sql = "INSERT INTO events (user_id, title, description, event_date) VALUES (?, ?, ?, ?)"
-    db.execute(sql, [user_id, title, description, event_date])
+    con = db.get_connection()
+    try:
+        with con:
+            event_id = con.execute(
+                "INSERT INTO events (user_id, title, description, event_date) VALUES (?, ?, ?, ?)",
+                [user_id, title, description, event_date]
+            ).lastrowid
 
-    event_id = db.last_insert_id()
-
-    sql_cat = "INSERT INTO event_categories (event_id, category_id) VALUES (?, ?)"
-    for cat_id in category_ids:
-        db.execute(sql_cat, [event_id, cat_id])
-
-    return event_id
+            for cat_id in category_ids:
+                con.execute(
+                    "INSERT INTO event_categories (event_id, category_id) VALUES (?, ?)",
+                    [event_id, cat_id]
+                )
+        return event_id
+    finally:
+        con.close()
 
 def get_event(event_id):
     sql = """
@@ -64,18 +70,31 @@ def add_rsvp(event_id, user_id, status):
         db.execute(sql, [event_id, user_id, status])
 
 def update_event(event_id, title, description, event_date, category_ids):
-    sql = "UPDATE events SET title = ?, description = ?, event_date = ? WHERE id = ?"
-    db.execute(sql, [title, description, event_date, event_id])
-
-    db.execute("DELETE FROM event_categories WHERE event_id = ?", [event_id])
-    sql_cat = "INSERT INTO event_categories (event_id, category_id) VALUES (?, ?)"
-    for cat_id in category_ids:
-        db.execute(sql_cat, [event_id, cat_id])
+    con = db.get_connection()
+    try:
+        with con:
+            con.execute(
+                "UPDATE events SET title = ?, description = ?, event_date = ? WHERE id = ?",
+                [title, description, event_date, event_id]
+            )
+            con.execute("DELETE FROM event_categories WHERE event_id = ?", [event_id])
+            for cat_id in category_ids:
+                con.execute(
+                    "INSERT INTO event_categories (event_id, category_id) VALUES (?, ?)",
+                    [event_id, cat_id]
+                )
+    finally:
+        con.close()
 
 def delete_event(event_id):
-    db.execute("DELETE FROM event_categories WHERE event_id = ?", [event_id])
-    db.execute("DELETE FROM rsvps WHERE event_id = ?", [event_id])
-    db.execute("DELETE FROM events WHERE id = ?", [event_id])
+    con = db.get_connection()
+    try:
+        with con:
+            con.execute("DELETE FROM event_categories WHERE event_id = ?", [event_id])
+            con.execute("DELETE FROM rsvps WHERE event_id = ?", [event_id])
+            con.execute("DELETE FROM events WHERE id = ?", [event_id])
+    finally:
+        con.close()
 
 def search_events(keyword, category_id, start_date, end_date):
     sql = """
