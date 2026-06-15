@@ -338,3 +338,11 @@ def profile_delete_date(date_id):
 
     users.delete_user_date(date_id, session["user_id"])
     return redirect("/user/" + str(session["user_id"]))
+
+@app.errorhandler(403)
+def forbidden_error(error):
+    return render_template("error.html", title="403 - Forbidden", message="You do not have permission to access this page."), 403
+
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template("error.html", title="404 - Not Found", message="The page you are looking for does not exist."), 404
