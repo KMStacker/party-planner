@@ -59,6 +59,7 @@ def create():
         flash("Username is already taken", "error")
         return render_template("register.html", username=username)
 
+    flash("Account created successfully! Please log in if you are eager to Party!", "success")
     return redirect("/")
 
 @app.route("/login", methods=["GET", "POST"])
