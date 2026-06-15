@@ -71,7 +71,7 @@ def delete_event(event_id):
     db.execute("DELETE FROM rsvps WHERE event_id = ?", [event_id])
     db.execute("DELETE FROM events WHERE id = ?", [event_id])
 
-def search_events(keyword, category_id, event_date):
+def search_events(keyword, category_id, start_date, end_date):
     sql = """SELECT DISTINCT events.id, events.user_id, events.title, events.event_date, users.username 
              FROM events 
              JOIN users ON events.user_id = users.id 
@@ -88,9 +88,13 @@ def search_events(keyword, category_id, event_date):
         sql += " AND event_categories.category_id = ?"
         params.append(category_id)
 
-    if event_date:
-        sql += " AND events.event_date = ?"
-        params.append(event_date)
+    if start_date:
+        sql += " AND events.event_date >= ?"
+        params.append(start_date)
+
+    if end_date:
+        sql += " AND events.event_date <= ?"
+        params.append(end_date)
 
     sql += " ORDER BY events.event_date ASC"
     return db.query(sql, params)

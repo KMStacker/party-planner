@@ -25,13 +25,18 @@
     </div>
 
     <div class="search-field field-date">
-      <label>Date:</label>
-      <input type="date" name="event_date" value="{{ event_date }}">
+      <label>Start Date:</label>
+      <input type="date" name="start_date" value="{{ start_date }}">
+    </div>
+
+    <div class="search-field field-date">
+      <label>End Date:</label>
+      <input type="date" name="end_date" value="{{ end_date }}">
     </div>
 
     <div>
       <input type="submit" class="btn btn-primary" value="Search">
-      {% if keyword or selected_category or event_date %}
+      {% if keyword or selected_category or start_date or end_date %}
         <a href="/" class="btn btn-clear">Clear</a>
       {% endif %}
     </div>

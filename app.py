@@ -13,10 +13,11 @@ app.secret_key = config.secret_key
 def index():
     keyword = request.args.get("keyword", "")
     category_id = request.args.get("category_id", "")
-    event_date = request.args.get("event_date", "")
+    start_date = request.args.get("start_date", "")
+    end_date = request.args.get("end_date", "")
 
-    if keyword or category_id or event_date:
-        all_events = events.search_events(keyword, category_id, event_date)
+    if keyword or category_id or start_date or end_date:
+        all_events = events.search_events(keyword, category_id, start_date, end_date)
     else:
         all_events = events.get_events()
         
@@ -27,7 +28,8 @@ def index():
                            categories=all_categories,
                            keyword=keyword,
                            selected_category=category_id,
-                           event_date=event_date)
+                           start_date=start_date,
+                           end_date=end_date)
 
 @app.route("/register")
 def register():
