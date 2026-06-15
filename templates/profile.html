@@ -5,109 +5,109 @@
 
 {% block content %}
 <h2 class="profile-title">
-    {{ icons.user() }} 
-    <span>{{ user.username }}</span>
+  {{ icons.user() }} 
+  <span>{{ user.username }}</span>
 </h2>
 
 <div class="event-card">
-    <h3>General Status</h3>
-    {% if user.status %}
-        <p class="profile-status-text">"{{ user.status }}"</p>
-    {% else %}
-        <p class="text-muted" style="color: gray;">No status set yet.</p>
-    {% endif %}
+  <h3>General Status</h3>
+  {% if user.status %}
+    <p class="profile-status-text">"{{ user.status }}"</p>
+  {% else %}
+    <p class="text-muted" style="color: gray;">No status set yet.</p>
+  {% endif %}
 
-    {% if session.user_id == user.id %}
-        <div>
-            <form action="/profile/update_status" method="post" class="inline-form">
-                <input type="text" name="status" placeholder="Type your desires here and update your status::" required minlength="2" maxlength="250" style="min-width: 300px;">
-                <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-                <input type="submit" class="btn btn-primary" value="Update Status" style="padding: 8px 15px;">
-            </form>
-            {% if user.status %}
-                <form action="/profile/delete_status" method="post" style="display: inline;">
-                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-                    <input type="submit" class="btn btn-primary" value="Clear Status" style="padding: 8px 15px; margin-left: 10px;"
-                        onclick="return confirm('Are you sure you want to clear your status?');">
-                </form>
-            {% endif %}
-        </div>
-    {% endif %}
+  {% if session.user_id == user.id %}
+    <div>
+      <form action="/profile/update_status" method="post" class="inline-form">
+        <input type="text" name="status" placeholder="Type your desires here and update your status::" required minlength="2" maxlength="250" style="min-width: 300px;">
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        <input type="submit" class="btn btn-primary" value="Update Status" style="padding: 8px 15px;">
+      </form>
+      {% if user.status %}
+        <form action="/profile/delete_status" method="post" style="display: inline;">
+          <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+          <input type="submit" class="btn btn-primary" value="Clear Status" style="padding: 8px 15px; margin-left: 10px;"
+            onclick="return confirm('Are you sure you want to clear your status?');">
+        </form>
+      {% endif %}
+    </div>
+  {% endif %}
 </div>
 
 <div class="stats-card">
-    <div>
-        <span class="stat-number">{{ stats.events_count }}</span>
-        <span class="stat-label">Events Created</span>
-    </div>
-    <div>
-        <span class="stat-number">{{ stats.rsvps_count }}</span>
-        <span class="stat-label">RSVPs Given</span>
-    </div>
+  <div>
+    <span class="stat-number">{{ stats.events_count }}</span>
+    <span class="stat-label">Events Created</span>
+  </div>
+  <div>
+    <span class="stat-number">{{ stats.rsvps_count }}</span>
+    <span class="stat-label">RSVPs Given</span>
+  </div>
 </div>
 
 <div class="event-card">
-    <h3>Availability Calendar</h3>
-    {% if user_dates %}
-        <ul class="calendar-list">
-            {% for d in user_dates %}
-                <li>
-                    <div class="icon-row">
-                        {{ icons.calendar() }}
-                        <span>
-                            <strong>
-                                {% if d.start_date == d.end_date %}
-                                    {{ d.start_date }}
-                                {% else %}
-                                    From {{ d.start_date }} to {{ d.end_date }}
-                                {% endif %}
-                            </strong> -
-                            <span class="{% if d.date_status == 'Available' %}status-available{% else %}status-unavailable{% endif %}">
-                                {{ d.date_status }}
-                            </span>
-                        </span>
-                    </div>
+  <h3>Availability Calendar</h3>
+  {% if user_dates %}
+    <ul class="calendar-list">
+      {% for d in user_dates %}
+        <li>
+          <div class="icon-row">
+            {{ icons.calendar() }}
+            <span>
+              <strong>
+                {% if d.start_date == d.end_date %}
+                  {{ d.start_date }}
+                {% else %}
+                  From {{ d.start_date }} to {{ d.end_date }}
+                {% endif %}
+              </strong> -
+            <span class="{% if d.date_status == 'Available' %}status-available{% else %}status-unavailable{% endif %}">
+                {{ d.date_status }}
+              </span>
+            </span>
+          </div>
                     
-                    {% if session.user_id == user.id %}
-                        <form action="/profile/delete_date/{{ d.id }}" method="post" style="margin: 0;">
-                            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-                            <input type="submit" value="×" class="btn-delete-x">
-                        </form>
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p style="color: gray;">No dates added yet.</p>
-    {% endif %}
+          {% if session.user_id == user.id %}
+            <form action="/profile/delete_date/{{ d.id }}" method="post" style="margin: 0;">
+              <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+              <input type="submit" value="×" class="btn-delete-x">
+            </form>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p style="color: gray;">No dates added yet.</p>
+  {% endif %}
 
-    {% if session.user_id == user.id %}
-        <h4 style="margin-top: 20px; margin-bottom: 5px;">Add Availability Date:</h4>
-        <form action="/profile/add_date" method="post" class="inline-form">
-            <input type="date" name="start_date_string" required>
-            <input type="date" name="end_date_string">
-            <select name="date_status">
-                <option value="Available">Available</option>
-                <option value="Unavailable">Unavailable</option>
-            </select>
-            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-            <input type="submit" class="btn btn-primary" value="Add" style="padding: 8px 15px;">
-        </form>
-    {% endif %}
+  {% if session.user_id == user.id %}
+    <h4 style="margin-top: 20px; margin-bottom: 5px;">Add Availability Date:</h4>
+    <form action="/profile/add_date" method="post" class="inline-form">
+      <input type="date" name="start_date_string" required>
+      <input type="date" name="end_date_string">
+      <select name="date_status">
+        <option value="Available">Available</option>
+        <option value="Unavailable">Unavailable</option>
+      </select>
+      <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+      <input type="submit" class="btn btn-primary" value="Add" style="padding: 8px 15px;">
+    </form>
+  {% endif %}
 </div>
 
 <h3>Events by {{ user.username }}</h3>
 {% if user_events %}
-    {% for event in user_events %}
-        <div class="event-card">
-            <h4><a href="/event/{{ event.id }}">{{ event.title }}</a></h4>
-            <div class="icon-row" style="color: gray; font-size: 0.9rem; margin-top: 5px;">
-                {{ icons.calendar() }}
-                <span>{{ event.event_date }}</span>
-            </div>
-        </div>
-    {% endfor %}
+  {% for event in user_events %}
+    <div class="event-card">
+      <h4><a href="/event/{{ event.id }}">{{ event.title }}</a></h4>
+      <div class="icon-row" style="color: gray; font-size: 0.9rem; margin-top: 5px;">
+        {{ icons.calendar() }}
+        <span>{{ event.event_date }}</span>
+      </div>
+    </div>
+  {% endfor %}
 {% else %}
-    <p>This user hasn't created any events yet.</p>
+  <p>This user hasn't created any events yet.</p>
 {% endif %}
 {% endblock %}

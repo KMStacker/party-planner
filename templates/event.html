@@ -30,7 +30,8 @@
     
     <form action="/event/{{ event.id }}/delete" method="post" style="display: inline-block; margin-left: 10px;">
       <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-      <input type="submit" value="Delete Event" onclick="return confirm('Are you sure you want to delete this event? This cannot be undone.');">
+      <input type="submit" value="Delete Event" 
+        onclick="return confirm('Are you sure you want to delete this event? This cannot be undone.');">
     </form>
   </div>
 {% endif %}
