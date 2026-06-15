@@ -1,6 +1,6 @@
 import sqlite3
 import secrets
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from flask import Flask, render_template, request, redirect, flash, session, abort
 import config
 import events
@@ -20,11 +20,11 @@ def index():
         all_events = events.search_events(keyword, category_id, start_date, end_date)
     else:
         all_events = events.get_events()
-        
+
     all_categories = events.get_categories()
-    
-    return render_template("index.html", 
-                           events=all_events, 
+
+    return render_template("index.html",
+                           events=all_events,
                            categories=all_categories,
                            keyword=keyword,
                            selected_category=category_id,
@@ -40,11 +40,11 @@ def create():
     username = request.form["username"].strip()
     password1 = request.form["password1"]
     password2 = request.form["password2"]
-    
+
     if not username:
         flash("Username cannot be empty or contain only spaces", "error")
         return render_template("register.html", username=username)
-    
+
     if len(username) < 3 or len(username) > 20:
         flash("Username length range is 3-20 characters without spaces", "error")
         return render_template("register.html", username=username)
@@ -66,20 +66,19 @@ def login():
     if request.method == "GET":
         return render_template("login.html")
 
-    if request.method == "POST":
-        username = request.form["username"].strip()
-        password = request.form["password"]
+    username = request.form["username"].strip()
+    password = request.form["password"]
 
-        user_id = users.check_login(username, password)
-        
-        if user_id:
-            session["user_id"] = user_id
-            session["username"] = username
-            session["csrf_token"] = secrets.token_hex(16)
-            return redirect("/")
-        else:
-            flash("Wrong username or password", "error")
-            return render_template("login.html", username=username)
+    user_id = users.check_login(username, password)
+
+    if user_id:
+        session["user_id"] = user_id
+        session["username"] = username
+        session["csrf_token"] = secrets.token_hex(16)
+        return redirect("/")
+
+    flash("Wrong username or password", "error")
+    return render_template("login.html", username=username)
 
 @app.route("/logout")
 def logout():
@@ -120,127 +119,175 @@ def create_event():
     int_category_ids = [int(cid) for cid in category_ids if cid.isdigit()]
 
     if not title or not description or not event_date:
-        flash("Title, description, and event date cannot be empty or contain only spaces", "error")
+        flash(
+            "Title, description, and event date cannot be empty or contain only spaces",
+            "error"
+        )
         categories = events.get_categories()
-        return render_template("new_event.html", categories=categories, title=title, description=description, event_date=event_date, event_category_ids=int_category_ids)
+        return render_template(
+            "new_event.html",
+            categories=categories,
+            title=title,
+            description=description,
+            event_date=event_date,
+            event_category_ids=int_category_ids
+        )
 
     if event_date < today:
         flash("Event date cannot be in the past", "error")
         categories = events.get_categories()
-        return render_template("new_event.html", categories=categories, title=title, description=description, event_date=event_date, event_category_ids=int_category_ids)
+        return render_template(
+            "new_event.html",
+            categories=categories,
+            title=title,
+            description=description,
+            event_date=event_date,
+            event_category_ids=int_category_ids
+        )
 
     events.create_event(session["user_id"], title, description, event_date, category_ids)
 
     return redirect("/")
 
-@app.route("/event/<int:id>")
-def show_event(id):
-    event = events.get_event(id)
+@app.route("/event/<int:event_id>")
+def show_event(event_id):
+    event = events.get_event(event_id)
     if not event:
         abort(404)
-        
-    categories = events.get_event_categories(id)
-    rsvps = events.get_rsvps(id)
-    
+
+    categories = events.get_event_categories(event_id)
+    rsvps = events.get_rsvps(event_id)
+
     return render_template("event.html", event=event, categories=categories, rsvps=rsvps)
 
 @app.route("/rsvp", methods=["POST"])
 def rsvp():
     require_login()
     check_csrf()
-    
+
     event_id = request.form["event_id"]
     rsvp_status = request.form["rsvp_status"]
-    
+
     events.add_rsvp(event_id, session["user_id"], rsvp_status)
-    
+
     return redirect("/event/" + str(event_id))
 
-@app.route("/event/<int:id>/edit")
-def edit_event(id):
+@app.route("/event/<int:event_id>/edit")
+def edit_event(event_id):
     require_login()
-    event = events.get_event(id)
-    
+    event = events.get_event(event_id)
+
     if not event or event["user_id"] != session["user_id"]:
         abort(403)
-        
-    categories = events.get_categories()
-    event_cats = events.get_event_categories(id)
-    event_category_ids = [cat["id"] for cat in event_cats]
-    
-    return render_template("edit_event.html", event=event, categories=categories, event_category_ids=event_category_ids)
 
-@app.route("/event/<int:id>/update", methods=["POST"])
-def update_event(id):
+    categories = events.get_categories()
+    event_cats = events.get_event_categories(event_id)
+    event_category_ids = [cat["id"] for cat in event_cats]
+
+    return render_template(
+        "edit_event.html",
+        event=event,
+        categories=categories,
+        event_category_ids=event_category_ids
+    )
+
+@app.route("/event/<int:event_id>/update", methods=["POST"])
+def update_event(event_id):
     require_login()
     check_csrf()
-    
-    event = events.get_event(id)
+
+    event = events.get_event(event_id)
     if not event or event["user_id"] != session["user_id"]:
         abort(403)
-        
+
     title = request.form["title"].strip()
     description = request.form["description"].strip()
     event_date = request.form["event_date"]
     category_ids = request.form.getlist("categories")
-    
+
     today = date.today().isoformat()
     int_category_ids = [int(cid) for cid in category_ids if cid.isdigit()]
 
     if not title or not description or not event_date:
         flash("Title, description, and event date cannot be empty or contain only spaces", "error")
         categories = events.get_categories()
-        updating_event = {"id": id, "title": title, "description": description, "event_date": event_date}
-        return render_template("edit_event.html", event=updating_event, categories=categories, event_category_ids=int_category_ids)
+        updating_event = {
+            "id": event_id,
+            "title": title,
+            "description": description,
+            "event_date": event_date
+        }
+        return render_template(
+            "edit_event.html",
+            event=updating_event,
+            categories=categories,
+            event_category_ids=int_category_ids
+        )
 
     if event_date < today:
         flash("Event date cannot be in the past", "error")
         categories = events.get_categories()
-        updating_event = {"id": id, "title": title, "description": description, "event_date": event_date}
-        return render_template("edit_event.html", event=updating_event, categories=categories, event_category_ids=int_category_ids)
+        updating_event = {
+            "id": event_id,
+            "title": title,
+            "description": description,
+            "event_date": event_date
+        }
+        return render_template(
+            "edit_event.html",
+            event=updating_event,
+            categories=categories,
+            event_category_ids=int_category_ids
+        )
 
-    events.update_event(id, title, description, event_date, category_ids)
-    return redirect("/event/" + str(id))
+    events.update_event(event_id, title, description, event_date, category_ids)
+    return redirect("/event/" + str(event_id))
 
-@app.route("/event/<int:id>/delete", methods=["POST"])
-def delete_event(id):
+@app.route("/event/<int:event_id>/delete", methods=["POST"])
+def delete_event(event_id):
     require_login()
     check_csrf()
-    
-    event = events.get_event(id)
+
+    event = events.get_event(event_id)
     if not event or event["user_id"] != session["user_id"]:
         abort(403)
-        
-    events.delete_event(id)
+
+    events.delete_event(event_id)
     return redirect("/")
 
-@app.route("/user/<int:id>")
-def user_profile(id):
-    user = users.get_user_profile(id)
+@app.route("/user/<int:event_id>")
+def user_profile(event_id):
+    user = users.get_user_profile(event_id)
     if not user:
         abort(404)
-        
-    stats = users.get_user_stats(id)
-    user_events = users.get_user_events(id)
-    user_dates = users.get_user_dates(id)
-    
-    return render_template("profile.html", user=user, stats=stats, user_events=user_events, user_dates=user_dates)
+
+    stats = users.get_user_stats(event_id)
+    user_events = users.get_user_events(event_id)
+    user_dates = users.get_user_dates(event_id)
+
+    return render_template(
+        "profile.html",
+        user=user,
+        stats=stats,
+        user_events=user_events,
+        user_dates=user_dates
+    )
 
 @app.route("/profile/update_status", methods=["POST"])
 def profile_status():
     require_login()
     check_csrf()
-    
+
     status = request.form["status"].strip()
 
     if not status:
         flash("Status cannot be empty or contain only spaces", "error")
         return redirect("/user/" + str(session["user_id"]))
-        
+
     if len(status) < 2 or len(status) > 250:
         flash("Status length range is 2-250 characters without spaces", "error")
         return redirect("/user/" + str(session["user_id"]))
-    
+
     users.update_status(session["user_id"], status)
 
     return redirect("/user/" + str(session["user_id"]))
@@ -249,7 +296,7 @@ def profile_status():
 def profile_delete_status():
     require_login()
     check_csrf()
-    
+
     users.update_status(session["user_id"], None)
     return redirect("/user/" + str(session["user_id"]))
 
@@ -257,11 +304,11 @@ def profile_delete_status():
 def profile_add_date():
     require_login()
     check_csrf()
-    
+
     start_date_string = request.form["start_date_string"]
     end_date_string = request.form["end_date_string"]
     date_status = request.form["date_status"]
-    
+
     try:
         start_date = datetime.strptime(start_date_string, "%Y-%m-%d").date()
         if end_date_string:
@@ -274,7 +321,7 @@ def profile_add_date():
     except ValueError:
         flash("Invalid date format. Please use YYYY-MM-DD and/or real dates.", "error")
         return redirect("/user/" + str(session["user_id"]))
-    
+
     end_date_string = end_date_string if end_date_string else start_date_string
 
     if users.overlapping_date_status(session["user_id"], start_date_string, end_date_string):
@@ -288,6 +335,6 @@ def profile_add_date():
 def profile_delete_date(date_id):
     require_login()
     check_csrf()
-    
+
     users.delete_user_date(date_id, session["user_id"])
     return redirect("/user/" + str(session["user_id"]))

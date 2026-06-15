@@ -9,16 +9,16 @@ def create_user(username, password):
 def check_login(username, password):
     sql = "SELECT id, password_hash FROM users WHERE username = ?"
     result = db.query(sql, [username])
-    
+
     if not result:
         return None
 
     user_id = result[0]["id"]
     password_hash = result[0]["password_hash"]
-    
+
     if check_password_hash(password_hash, password):
         return user_id
-        
+
     return None
 
 def get_user_profile(user_id):
@@ -33,10 +33,10 @@ def update_status(user_id, status):
 def get_user_stats(user_id):
     sql1 = "SELECT COUNT(*) as count FROM events WHERE user_id = ?"
     events_count = db.query(sql1, [user_id])[0]["count"]
-    
+
     sql2 = "SELECT COUNT(*) as count FROM rsvps WHERE user_id = ?"
     rsvps_count = db.query(sql2, [user_id])[0]["count"]
-    
+
     return {"events_count": events_count, "rsvps_count": rsvps_count}
 
 def get_user_events(user_id):
@@ -44,11 +44,19 @@ def get_user_events(user_id):
     return db.query(sql, [user_id])
 
 def get_user_dates(user_id):
-    sql = "SELECT id, start_date, end_date, date_status FROM user_availability WHERE user_id = ? ORDER BY start_date ASC"
+    sql = """
+    SELECT id, start_date, end_date, date_status 
+    FROM user_availability 
+    WHERE user_id = ? 
+    ORDER BY start_date ASC
+    """
     return db.query(sql, [user_id])
 
 def add_user_availability(user_id, start_date, end_date, date_status):
-    sql = "INSERT INTO user_availability (user_id, start_date, end_date, date_status) VALUES (?, ?, ?, ?)"
+    sql = """
+    INSERT INTO user_availability (user_id, start_date, end_date, date_status) 
+    VALUES (?, ?, ?, ?)
+    """
     db.execute(sql, [user_id, start_date, end_date, date_status])
 
 def delete_user_date(date_id, user_id):
