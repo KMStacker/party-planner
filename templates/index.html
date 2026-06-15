@@ -40,29 +40,35 @@
         <a href="/" class="btn btn-clear">Clear</a>
       {% endif %}
     </div>
-
+    
   </div>
 </form>
 
 <h2>Upcoming Events</h2>
 
 {% if events %}
-    <ul>
-    {% for event in events %}
-        <li>
-            <a href="/event/{{ event.id }}"><strong>{{ event.title }}</strong></a>
-            <div class="icon-row" style="margin-top: 8px;">
-                {{ icons.calendar() }}
-                <span>{{ event.event_date }}</span>
-            </div>
-            <div class="icon-row">
-                {{ icons.user() }}
-                <span>Organized by: <a href="/user/{{ event.user_id }}"><strong>{{ event.username }}</strong></a></span>
-            </div>
-        </li>
-    {% endfor %}
-    </ul>
+  <ul>
+  {% for event in events %}
+    <li>
+      <a href="/event/{{ event.id }}"><strong>{{ event.title }}</strong></a>
+      <div class="icon-row" style="margin-top: 8px;">
+        {{ icons.calendar() }}
+        <span>
+          {% if event.event_date == event.end_date %}
+            {{ event.event_date }}
+          {% else %}
+            {{ event.event_date }} to {{ event.end_date }}
+          {% endif %}
+        </span>
+      </div>
+      <div class="icon-row">
+        {{ icons.user() }}
+        <span>Organized by: <a href="/user/{{ event.user_id }}"><strong>{{ event.username }}</strong></a></span>
+      </div>
+    </li>
+  {% endfor %}
+  </ul>
 {% else %}
-    <p>No events planned yet!</p>
+  <p>No events planned yet!</p>
 {% endif %}
 {% endblock %}

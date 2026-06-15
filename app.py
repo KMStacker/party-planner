@@ -114,10 +114,25 @@ def create_event():
     title = request.form["title"].strip()
     description = request.form["description"].strip()
     event_date = request.form["event_date"]
-    category_ids = request.form.getlist("categories")
+    end_date = request.form["end_date"]
 
+    category_ids = request.form.getlist("categories")
     today = date.today().isoformat()
     int_category_ids = [int(cid) for cid in category_ids if cid.isdigit()]
+
+    if not end_date:
+        end_date = event_date
+    if end_date < event_date:
+        flash("End date cannot be before start date", "error")
+        categories = events.get_categories()
+        return render_template(
+            "new_event.html",
+            categories=categories,
+            title=title,
+            description=description,
+            event_date=event_date,
+            end_date=end_date
+        )
 
     if not title or not description or not event_date:
         flash(
@@ -158,7 +173,7 @@ def create_event():
             event_category_ids=int_category_ids
         )
 
-    events.create_event(session["user_id"], title, description, event_date, category_ids)
+    events.create_event(session["user_id"], title, description, event_date, end_date, category_ids)
 
     return redirect("/")
 
@@ -216,10 +231,29 @@ def update_event(event_id):
     title = request.form["title"].strip()
     description = request.form["description"].strip()
     event_date = request.form["event_date"]
-    category_ids = request.form.getlist("categories")
+    end_date = request.form["end_date"]
 
+    category_ids = request.form.getlist("categories")
     today = date.today().isoformat()
     int_category_ids = [int(cid) for cid in category_ids if cid.isdigit()]
+
+    if not end_date:
+        end_date = event_date
+    if end_date < event_date:
+        flash("End date cannot be before start date", "error")
+        categories = events.get_categories()
+        updating_event = {
+            "id": event_id,
+            "title": title,
+            "description": description,
+            "event_date": event_date
+        }
+        return render_template(
+            "edit_event.html",
+            event=updating_event,
+            categories=categories,
+            event_category_ids=int_category_ids
+        )
 
     if not title or not description or not event_date:
         flash("Title, description, and event date cannot be empty or contain only spaces", "error")

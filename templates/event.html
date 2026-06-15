@@ -6,7 +6,12 @@
 <h2>{{ event.title }}</h2>
 
 <p>
-  <strong>Date:</strong> {{ event.event_date }}<br>
+  <strong>Date:</strong>
+  {% if event.event_date == event.end_date %}
+    {{ event.event_date }}
+  {% else %}
+    {{ event.event_date }} to {{ event.end_date }}
+  {% endif %}<br>
   <strong>Organizer:</strong> {{ event.username }}
 </p>
 
@@ -39,7 +44,7 @@
 <h3>RSVPs</h3>
 <ul>
   {% for rsvp in rsvps %}
-    <li><strong>{{ rsvp.username }}</strong>: {{ rsvp.status }}</li>
+    <li><strong>{{ rsvp.username }}</strong>: {{ rsvp.rsvp_status }}</li>
   {% else %}
     <li>No RSVPs yet.</li>
   {% endfor %}

@@ -16,6 +16,7 @@ CREATE TABLE events (
     title TEXT NOT NULL,
     description TEXT,
     event_date TEXT NOT NULL,
+    end_date TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
@@ -32,7 +33,7 @@ CREATE TABLE rsvps (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     event_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
-    status TEXT NOT NULL,
+    rsvp_status TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,

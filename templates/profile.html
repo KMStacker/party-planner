@@ -103,7 +103,13 @@
       <h4><a href="/event/{{ event.id }}">{{ event.title }}</a></h4>
       <div class="icon-row" style="color: gray; font-size: 0.9rem; margin-top: 5px;">
         {{ icons.calendar() }}
-        <span>{{ event.event_date }}</span>
+        <span>
+          {% if event.event_date == event.end_date %}
+            {{ event.event_date }}
+          {% else %}
+            {{ event.event_date }} to {{ event.end_date }}
+          {% endif %}
+        </span>
       </div>
     </div>
   {% endfor %}

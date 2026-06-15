@@ -2,7 +2,7 @@ import db
 
 def get_events():
     sql = """
-    SELECT events.id, events.user_id, events.title, events.event_date, users.username
+    SELECT events.id, events.user_id, events.title, events.event_date, events.end_date, users.username
     FROM events 
     JOIN users ON events.user_id = users.id 
     ORDER BY events.event_date ASC
@@ -13,13 +13,13 @@ def get_categories():
     sql = "SELECT id, name FROM categories ORDER BY name"
     return db.query(sql)
 
-def create_event(user_id, title, description, event_date, category_ids):
+def create_event(user_id, title, description, event_date, end_date, category_ids):
     con = db.get_connection()
     try:
         with con:
             event_id = con.execute(
-                "INSERT INTO events (user_id, title, description, event_date) VALUES (?, ?, ?, ?)",
-                [user_id, title, description, event_date]
+                "INSERT INTO events (user_id, title, description, event_date, end_date) VALUES (?, ?, ?, ?, ?)",
+                [user_id, title, description, event_date, end_date]
             ).lastrowid
 
             for cat_id in category_ids:
@@ -33,7 +33,7 @@ def create_event(user_id, title, description, event_date, category_ids):
 
 def get_event(event_id):
     sql = """
-    SELECT events.id, events.user_id, events.title, events.description, events.event_date, users.username
+    SELECT events.id, events.user_id, events.title, events.description, events.event_date, events.end_date, users.username
     FROM events
     JOIN users ON events.user_id = users.id
     WHERE events.id = ?
@@ -66,13 +66,13 @@ def add_rsvp(event_id, user_id, rsvp_status):
     """
     db.execute(sql, [event_id, user_id, rsvp_status])
 
-def update_event(event_id, title, description, event_date, category_ids):
+def update_event(event_id, title, description, event_date, end_date, category_ids):
     con = db.get_connection()
     try:
         with con:
             con.execute(
-                "UPDATE events SET title = ?, description = ?, event_date = ? WHERE id = ?",
-                [title, description, event_date, event_id]
+                "UPDATE events SET title = ?, description = ?, event_date = ?, end_date = ? WHERE id = ?",
+                [title, description, event_date, end_date, event_id]
             )
             con.execute("DELETE FROM event_categories WHERE event_id = ?", [event_id])
             for cat_id in category_ids:

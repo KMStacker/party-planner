@@ -14,9 +14,12 @@
     <label for="description">Description:</label><br>
     <textarea name="description" id="description" rows="5" cols="40" required maxlength="1000">{{ description or '' }}</textarea>
   </p>
-  <p>
-    <label for="event_date">Date:</label><br>
-    <input type="date" name="event_date" id="event_date" required value="{{ event_date or '' }}">
+  <p class="inline-form">
+    <label for="event_date">Start Date:</label>
+    <input type="date" name="event_date" id="event_date" value="{{ event.event_date if event else '' }}" required>
+  
+    <label for="end_date">End Date (optional):</label>
+    <input type="date" name="end_date" id="end_date" value="{{ event.end_date if event else '' }}">
   </p>
   <p>
     <label>Categories:</label><br>

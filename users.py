@@ -40,7 +40,7 @@ def get_user_stats(user_id):
     return {"events_count": events_count, "rsvps_count": rsvps_count}
 
 def get_user_events(user_id):
-    sql = "SELECT id, title, event_date FROM events WHERE user_id = ? ORDER BY event_date ASC"
+    sql = "SELECT id, title, event_date, end_date FROM events WHERE user_id = ? ORDER BY event_date ASC"
     return db.query(sql, [user_id])
 
 def get_user_dates(user_id):
