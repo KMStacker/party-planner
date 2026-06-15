@@ -21,7 +21,7 @@
   <p>
     <label>Categories:</label><br>
     {% for category in categories %}
-      <input type="checkbox" name="categories" value="{{ category.id }}" id="cat_{{ category.id }}">
+      <input type="checkbox" name="categories" value="{{ category.id }}" id="cat_{{ category.id }}"
         {% if event_category_ids and category.id in event_category_ids %}checked{% endif %}>
       <label for="cat_{{ category.id }}">{{ category.name }}</label><br>
     {% endfor %}
