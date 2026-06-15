@@ -50,7 +50,7 @@ def get_event_categories(event_id):
 
 def get_rsvps(event_id):
     sql = """
-    SELECT users.username, rsvps.status
+    SELECT users.username, rsvps.rsvp_status
     FROM rsvps
     JOIN users ON rsvps.user_id = users.id
     WHERE rsvps.event_id = ?
@@ -58,16 +58,13 @@ def get_rsvps(event_id):
     """
     return db.query(sql, [event_id])
 
-def add_rsvp(event_id, user_id, status):
-    sql_check = "SELECT id FROM rsvps WHERE event_id = ? AND user_id = ?"
-    existing = db.query(sql_check, [event_id, user_id])
-
-    if existing:
-        sql = "UPDATE rsvps SET status = ? WHERE event_id = ? AND user_id = ?"
-        db.execute(sql, [status, event_id, user_id])
-    else:
-        sql = "INSERT INTO rsvps (event_id, user_id, status) VALUES (?, ?, ?)"
-        db.execute(sql, [event_id, user_id, status])
+def add_rsvp(event_id, user_id, rsvp_status):
+    sql = """
+    INSERT INTO rsvps (event_id, user_id, rsvp_status)
+    VALUES (?, ?, ?)
+    ON CONFLICT(event_id, user_id) DO UPDATE SET rsvp_status = excluded.rsvp_status
+    """
+    db.execute(sql, [event_id, user_id, rsvp_status])
 
 def update_event(event_id, title, description, event_date, category_ids):
     con = db.get_connection()
