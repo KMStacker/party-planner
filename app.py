@@ -144,49 +144,32 @@ def create_event():
     today = date.today().isoformat()
     int_category_ids = [int(cid) for cid in category_ids if cid.isdigit()]
 
+    errors = []
+
     if not end_date:
         end_date = event_date
-    if end_date < event_date:
-        flash("End date cannot be before start date", "error")
-        categories = events.get_categories()
-        return render_template(
-            "new_event.html",
-            categories=categories,
-            title=title,
-            description=description,
-            event_date=event_date,
-            end_date=end_date
-        )
 
-    if not title or not description or not event_date:
-        flash(
-            "Title, description, and event date cannot be empty or contain only spaces",
-            "error"
-        )
-        categories = events.get_categories()
-        return render_template(
-            "new_event.html",
-            categories=categories,
-            title=title,
-            description=description,
-            event_date=event_date,
-            event_category_ids=int_category_ids
-        )
-    
-    if len(title) > 50 or len(description) > 1000:
-        flash("Title max legth is 50 characters and description max length is 1000 characters", "error")
-        categories = events.get_categories()
-        return render_template(
-            "new_event.html",
-            categories=categories,
-            title=title,
-            description=description,
-            event_date=event_date,
-            event_category_ids=int_category_ids
-        )
+    if not title:
+        errors.append("Title cannot be empty or contain only spaces")
+    if not description:
+        errors.append("Description cannot be empty or contain only spaces")
 
-    if event_date < today:
-        flash("Event date cannot be in the past", "error")
+    if len(title) > 50:
+        errors.append("Title max length is 50 characters")
+    if len(description) > 1000:
+        errors.append("Description max length is 1000 characters")
+
+    if not event_date:
+        errors.append("Event start date cannot be empty")
+    elif event_date < today:
+        errors.append("Event start date cannot be in the past")
+
+    if event_date and end_date and event_date > end_date:
+        errors.append("Event start date cannot be after end date")
+  
+    if errors:
+        for error in errors:
+            flash(error, "error")
         categories = events.get_categories()
         return render_template(
             "new_event.html",
@@ -194,6 +177,7 @@ def create_event():
             title=title,
             description=description,
             event_date=event_date,
+            end_date=end_date,
             event_category_ids=int_category_ids
         )
 
@@ -248,11 +232,33 @@ def update_event(event_id):
     category_ids = request.form.getlist("categories")
     today = date.today().isoformat()
     int_category_ids = [int(cid) for cid in category_ids if cid.isdigit()]
+    
+    errors = []
 
     if not end_date:
         end_date = event_date
-    if end_date < event_date:
-        flash("End date cannot be before start date", "error")
+
+    if not title:
+        errors.append("Title cannot be empty or contain only spaces")
+    if not description:
+        errors.append("Description cannot be empty or contain only spaces")
+
+    if len(title) > 50:
+        errors.append("Title max length is 50 characters")
+    if len(description) > 1000:
+        errors.append("Description max length is 1000 characters")
+
+    if not event_date:
+        errors.append("Event start date cannot be empty")
+    elif event_date < today:
+        errors.append("Event start date cannot be in the past")
+
+    if event_date and end_date and event_date > end_date:
+        errors.append("Event start date cannot be after end date")
+  
+    if errors:
+        for error in errors:
+            flash(error, "error")
         categories = events.get_categories()
         updating_event = {
             "id": event_id,
@@ -267,55 +273,7 @@ def update_event(event_id):
             event_category_ids=int_category_ids
         )
 
-    if not title or not description or not event_date:
-        flash("Title, description, and event date cannot be empty or contain only spaces", "error")
-        categories = events.get_categories()
-        updating_event = {
-            "id": event_id,
-            "title": title,
-            "description": description,
-            "event_date": event_date
-        }
-        return render_template(
-            "edit_event.html",
-            event=updating_event,
-            categories=categories,
-            event_category_ids=int_category_ids
-        )
-
-    if len(title) > 50 or len(description) > 1000:
-        flash("Title max legth is 50 characters and description max length is 1000 characters", "error")
-        categories = events.get_categories()
-        updating_event = {
-            "id": event_id,
-            "title": title,
-            "description": description,
-            "event_date": event_date
-        }
-        return render_template(
-            "edit_event.html",
-            event=updating_event,
-            categories=categories,
-            event_category_ids=int_category_ids
-        )
-
-    if event_date < today:
-        flash("Event date cannot be in the past", "error")
-        categories = events.get_categories()
-        updating_event = {
-            "id": event_id,
-            "title": title,
-            "description": description,
-            "event_date": event_date
-        }
-        return render_template(
-            "edit_event.html",
-            event=updating_event,
-            categories=categories,
-            event_category_ids=int_category_ids
-        )
-
-    events.update_event(event_id, title, description, event_date, category_ids)
+    events.update_event(event_id, title, description, event_date, end_date, category_ids)
     return redirect("/event/" + str(event_id))
 
 @app.route("/event/<int:event_id>/delete", methods=["POST"])
