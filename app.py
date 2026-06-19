@@ -9,6 +9,32 @@ import users
 app = Flask(__name__)
 app.secret_key = config.secret_key
 
+# ---------- Helper functions ----------
+
+def require_login():
+    if "user_id" not in session:
+        abort(403)
+
+def check_csrf():
+    if "csrf_token" not in request.form:
+        abort(403)
+    if request.form["csrf_token"] != session["csrf_token"]:
+        abort(403)
+
+
+# ---------- Error handlers ----------
+
+@app.errorhandler(403)
+def forbidden_error(error):
+    return render_template("error.html", title="403 - Forbidden", message="You do not have permission to access this page."), 403
+
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template("error.html", title="404 - Not Found", message="The page you are looking for does not exist."), 404
+
+
+# ---------- Home and authentication routes ----------
+
 @app.route("/")
 def index():
     keyword = request.args.get("keyword", "")
@@ -35,7 +61,7 @@ def index():
 def register():
     return render_template("register.html")
 
-@app.route("/create", methods=["POST"])
+@app.route("/create_account", methods=["POST"])
 def create():
     username = request.form["username"].strip()
     password1 = request.form["password1"]
@@ -90,15 +116,8 @@ def logout():
             del session["csrf_token"]
     return redirect("/")
 
-def require_login():
-    if "user_id" not in session:
-        abort(403)
 
-def check_csrf():
-    if "csrf_token" not in request.form:
-        abort(403)
-    if request.form["csrf_token"] != session["csrf_token"]:
-        abort(403)
+# ---------- Event routes ----------
 
 @app.route("/event/new")
 def new_event():
@@ -187,18 +206,6 @@ def show_event(event_id):
     rsvps = events.get_rsvps(event_id)
 
     return render_template("event.html", event=event, categories=categories, rsvps=rsvps)
-
-@app.route("/rsvp", methods=["POST"])
-def rsvp():
-    require_login()
-    check_csrf()
-
-    event_id = request.form["event_id"]
-    rsvp_status = request.form["rsvp_status"]
-
-    events.add_rsvp(event_id, session["user_id"], rsvp_status)
-
-    return redirect("/event/" + str(event_id))
 
 @app.route("/event/<int:event_id>/edit")
 def edit_event(event_id):
@@ -318,6 +325,9 @@ def delete_event(event_id):
     events.delete_event(event_id)
     return redirect("/")
 
+
+# ---------- User and profile routes ----------
+
 @app.route("/user/<int:event_id>")
 def user_profile(event_id):
     user = users.get_user_profile(event_id)
@@ -402,10 +412,17 @@ def profile_delete_date(date_id):
     users.delete_user_date(date_id, session["user_id"])
     return redirect("/user/" + str(session["user_id"]))
 
-@app.errorhandler(403)
-def forbidden_error(error):
-    return render_template("error.html", title="403 - Forbidden", message="You do not have permission to access this page."), 403
 
-@app.errorhandler(404)
-def not_found_error(error):
-    return render_template("error.html", title="404 - Not Found", message="The page you are looking for does not exist."), 404
+# ---------- RSVP routes ----------
+
+@app.route("/rsvp", methods=["POST"])
+def rsvp():
+    require_login()
+    check_csrf()
+
+    event_id = request.form["event_id"]
+    rsvp_status = request.form["rsvp_status"]
+
+    events.add_rsvp(event_id, session["user_id"], rsvp_status)
+
+    return redirect("/event/" + str(event_id))

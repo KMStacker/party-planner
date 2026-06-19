@@ -5,7 +5,7 @@
 {% block content %}
 <h2>Create an Account</h2>
 
-<form action="/create" method="post">
+<form action="/create_account" method="post">
   <p>
     <label for="username">Username:</label><br>
     <input type="text" name="username" id="username" required minlength="3" maxlength="20" value="{{ username or '' }}">
