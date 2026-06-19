@@ -20,7 +20,7 @@
   {% if session.user_id == user.id %}
     <div>
       <form action="/profile/update_status" method="post" class="inline-form">
-        <input type="text" name="status" placeholder="Type your desires here and update your status::" required minlength="2" maxlength="250" style="min-width: 300px;">
+        <input type="text" name="status" placeholder="Type your desires here and update your status::" style="min-width: 300px;">
         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
         <input type="submit" class="btn btn-primary" value="Update Status" style="padding: 8px 15px;">
       </form>
@@ -84,7 +84,7 @@
   {% if session.user_id == user.id %}
     <h4 style="margin-top: 20px; margin-bottom: 5px;">Add Availability Date:</h4>
     <form action="/profile/add_date" method="post" class="inline-form">
-      <input type="date" name="start_date_string" required>
+      <input type="date" name="start_date_string">
       <input type="date" name="end_date_string">
       <select name="date_status">
         <option value="Available">Available</option>

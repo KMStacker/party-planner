@@ -8,15 +8,15 @@
 <form action="/create_event" method="post">
   <p>
     <label for="title">Title:</label><br>
-    <input type="text" name="title" id="title" required maxlength="50" value="{{ title or '' }}">
+    <input type="text" name="title" id="title" value="{{ title or '' }}">
   </p>
   <p>
     <label for="description">Description:</label><br>
-    <textarea name="description" id="description" rows="5" cols="40" required maxlength="1000">{{ description or '' }}</textarea>
+    <textarea name="description" id="description" rows="5" cols="40">{{ description or '' }}</textarea>
   </p>
   <p class="inline-form">
     <label for="event_date">Start Date:</label>
-    <input type="date" name="event_date" id="event_date" value="{{ event.event_date if event else '' }}" required>
+    <input type="date" name="event_date" id="event_date" value="{{ event.event_date if event else '' }}"
   
     <label for="end_date">End Date (optional):</label>
     <input type="date" name="end_date" id="end_date" value="{{ event.end_date if event else '' }}">

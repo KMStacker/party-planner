@@ -53,7 +53,7 @@
 {% if session.user_id %}
   <h4>Your RSVP</h4>
   <form action="/rsvp" method="post">
-    <input type="radio" id="status_in" name="rsvp_status" value="In" required>
+    <input type="radio" id="status_in" name="rsvp_status" value="In">
     <label for="status_in">In</label>
     
     <input type="radio" id="status_maybe" name="rsvp_status" value="Maybe">

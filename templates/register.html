@@ -8,15 +8,15 @@
 <form action="/create_account" method="post">
   <p>
     <label for="username">Username:</label><br>
-    <input type="text" name="username" id="username" required minlength="3" maxlength="20" value="{{ username or '' }}">
+    <input type="text" name="username" id="username" value="{{ username or '' }}">
   </p>
   <p>
     <label for="password1">Password:</label><br>
-    <input type="password" name="password1" id="password1" required>
+    <input type="password" name="password1" id="password1">
   </p>
   <p>
     <label for="password2">Confirm Password:</label><br>
-    <input type="password" name="password2" id="password2" required>
+    <input type="password" name="password2" id="password2">
   </p>
   <input type="submit" value="Register">
 </form>

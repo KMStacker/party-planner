@@ -8,11 +8,11 @@
 <form action="/login" method="post">
   <p>
     <label for="username">Username:</label><br>
-    <input type="text" name="username" id="username" required maxlength="20" value="{{ username or '' }}">
+    <input type="text" name="username" id="username" value="{{ username or '' }}">
   </p>
   <p>
     <label for="password">Password:</label><br>
-    <input type="password" name="password" id="password" required>
+    <input type="password" name="password" id="password">
   </p>
   <input type="submit" value="Login">
 </form>
