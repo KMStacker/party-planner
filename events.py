@@ -92,8 +92,6 @@ def delete_event(event_id):
     con = db.get_connection()
     try:
         with con:
-            con.execute("DELETE FROM event_categories WHERE event_id = ?", [event_id])
-            con.execute("DELETE FROM rsvps WHERE event_id = ?", [event_id])
             con.execute("DELETE FROM events WHERE id = ?", [event_id])
     finally:
         con.close()
