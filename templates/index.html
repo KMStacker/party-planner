@@ -69,6 +69,10 @@
   {% endfor %}
   </ul>
 {% else %}
-  <p>No events planned yet!</p>
+  {% if keyword or selected_category or start_date or end_date %}
+    <p>No events found matching your search criteria.</p>
+  {% else %}
+    <p>No events planned yet!</p>
+  {% endif %}
 {% endif %}
 {% endblock %}
