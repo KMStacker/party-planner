@@ -291,15 +291,15 @@ def delete_event(event_id):
 
 # ---------- User and profile routes ----------
 
-@app.route("/user/<int:event_id>")
-def user_profile(event_id):
-    user = users.get_user_profile(event_id)
+@app.route("/user/<int:user_id>")
+def user_profile(user_id):
+    user = users.get_user_profile(user_id)
     if not user:
         abort(404)
 
-    stats = users.get_user_stats(event_id)
-    user_events = users.get_user_events(event_id)
-    user_dates = users.get_user_dates(event_id)
+    stats = users.get_user_stats(user_id)
+    user_events = users.get_user_events(user_id)
+    user_dates = users.get_user_dates(user_id)
 
     return render_template(
         "profile.html",
@@ -344,18 +344,28 @@ def profile_add_date():
     start_date_string = request.form["start_date_string"]
     end_date_string = request.form["end_date_string"]
     date_status = request.form["date_status"]
+    errors = []
 
-    try:
-        start_date = datetime.strptime(start_date_string, "%Y-%m-%d").date()
-        if end_date_string:
+    if not start_date_string:
+        errors.append("Start date cannot be empty")
+
+    if start_date_string:
+        try:
+            start_date = datetime.strptime(start_date_string, "%Y-%m-%d").date()
+        except ValueError:
+            errors.append("Invalid start date format. Please use YYYY-MM-DD")
+
+    if end_date_string:
+        try:
             end_date = datetime.strptime(end_date_string, "%Y-%m-%d").date()
-            if end_date < start_date:
-                flash("End date cannot be before start date.", "error")
-                return redirect("/user/" + str(session["user_id"]))
-        else:
-            end_date = start_date
-    except ValueError:
-        flash("Invalid date format. Please use YYYY-MM-DD and/or real dates.", "error")
+        except ValueError:
+            errors.append("Invalid end date format. Please use YYYY-MM-DD")
+        if start_date and end_date and end_date < start_date:
+            errors.append("End date cannot be before start date")
+
+    if errors:
+        for error in errors:
+            flash(error, "error")
         return redirect("/user/" + str(session["user_id"]))
 
     end_date_string = end_date_string if end_date_string else start_date_string
