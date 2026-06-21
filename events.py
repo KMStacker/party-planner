@@ -58,6 +58,11 @@ def get_rsvps(event_id):
     """
     return db.query(sql, [event_id])
 
+def get_user_rsvp(event_id, user_id):
+    sql = "SELECT rsvp_status FROM rsvps WHERE event_id = ? AND user_id = ?"
+    result = db.query(sql, [event_id, user_id])
+    return result[0]["rsvp_status"] if result else None
+
 def add_rsvp(event_id, user_id, rsvp_status):
     sql = """
     INSERT INTO rsvps (event_id, user_id, rsvp_status)

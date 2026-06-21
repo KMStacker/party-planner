@@ -194,7 +194,11 @@ def show_event(event_id):
     categories = events.get_event_categories(event_id)
     rsvps = events.get_rsvps(event_id)
 
-    return render_template("event.html", event=event, categories=categories, rsvps=rsvps)
+    user_rsvp = None
+    if "user_id" in session:
+        user_rsvp = events.get_user_rsvp(event_id, session["user_id"])
+
+    return render_template("event.html", event=event, categories=categories, rsvps=rsvps, user_rsvp=user_rsvp)
 
 @app.route("/event/<int:event_id>/edit")
 def edit_event(event_id):
@@ -398,4 +402,5 @@ def rsvp():
 
     events.add_rsvp(event_id, session["user_id"], rsvp_status)
 
+    flash("Your RSVP status has been updated successfully!", "success")
     return redirect("/event/" + str(event_id))
