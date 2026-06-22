@@ -140,7 +140,7 @@ def create_event():
     event_date = request.form["event_date"]
     end_date = request.form["end_date"]
 
-    category_ids = request.form.getlist("categories")
+    category_ids = list(set(request.form.getlist("categories")))
     today = date.today().isoformat()
     int_category_ids = [int(cid) for cid in category_ids if cid.isdigit()]
 
@@ -233,7 +233,7 @@ def update_event(event_id):
     event_date = request.form["event_date"]
     end_date = request.form["end_date"]
 
-    category_ids = request.form.getlist("categories")
+    category_ids = list(set(request.form.getlist("categories")))
     today = date.today().isoformat()
     int_category_ids = [int(cid) for cid in category_ids if cid.isdigit()]
     
