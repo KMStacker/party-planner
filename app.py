@@ -1,7 +1,8 @@
 import sqlite3
 import secrets
+import time
 from datetime import date, datetime
-from flask import Flask, render_template, request, redirect, flash, session, abort
+from flask import Flask, render_template, request, redirect, flash, session, abort, g
 import config
 import events
 import users
@@ -24,6 +25,17 @@ def check_csrf():
 def require_owner(event):
     if not event or event["user_id"] != session["user_id"]:
         abort(403)
+
+@app.before_request
+def before_request():
+    g.start_time = time.time()
+
+@app.after_request
+def after_request(response):
+    if hasattr(g, "start_time"):
+        elapsed_time = round(time.time() - g.start_time, 2)
+        print("elapsed time:", elapsed_time, "s")
+    return response
 
 
 # ---------- Error handlers ----------
