@@ -21,6 +21,10 @@ def check_csrf():
     if request.form["csrf_token"] != session["csrf_token"]:
         abort(403)
 
+def require_owner(event):
+    if not event or event["user_id"] != session["user_id"]:
+        abort(403)
+
 
 # ---------- Error handlers ----------
 
@@ -204,9 +208,7 @@ def show_event(event_id):
 def edit_event(event_id):
     require_login()
     event = events.get_event(event_id)
-
-    if not event or event["user_id"] != session["user_id"]:
-        abort(403)
+    require_owner(event)
 
     categories = events.get_categories()
     event_cats = events.get_event_categories(event_id)
@@ -223,10 +225,8 @@ def edit_event(event_id):
 def update_event(event_id):
     require_login()
     check_csrf()
-
     event = events.get_event(event_id)
-    if not event or event["user_id"] != session["user_id"]:
-        abort(403)
+    require_owner(event)
 
     title = request.form["title"].strip()
     description = request.form["description"].strip()
@@ -285,10 +285,8 @@ def update_event(event_id):
 def delete_event(event_id):
     require_login()
     check_csrf()
-
     event = events.get_event(event_id)
-    if not event or event["user_id"] != session["user_id"]:
-        abort(403)
+    require_owner(event)
 
     events.delete_event(event_id)
     return redirect("/")
