@@ -165,7 +165,7 @@ def create_event():
         errors.append("Event start date cannot be in the past")
 
     if event_date and end_date and event_date > end_date:
-        errors.append("Event start date cannot be after end date")
+        errors.append("Event end date cannot be before start date")
   
     if errors:
         for error in errors:
@@ -258,7 +258,7 @@ def update_event(event_id):
         errors.append("Event start date cannot be in the past")
 
     if event_date and end_date and event_date > end_date:
-        errors.append("Event start date cannot be after end date")
+        errors.append("Event end date cannot be before start date")
   
     if errors:
         for error in errors:
@@ -268,7 +268,8 @@ def update_event(event_id):
             "id": event_id,
             "title": title,
             "description": description,
-            "event_date": event_date
+            "event_date": event_date,
+            "end_date": end_date
         }
         return render_template(
             "edit_event.html",

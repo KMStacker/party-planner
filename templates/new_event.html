@@ -16,10 +16,10 @@
   </p>
   <p class="inline-form">
     <label for="event_date">Start Date:</label>
-    <input type="date" name="event_date" id="event_date" value="{{ event.event_date if event else '' }}"
+    <input type="date" name="event_date" id="event_date" value="{{ event_date or '' }}">
   
     <label for="end_date">End Date (optional):</label>
-    <input type="date" name="end_date" id="end_date" value="{{ event.end_date if event else '' }}">
+    <input type="date" name="end_date" id="end_date" value="{{ end_date or '' }}">
   </p>
   <p>
     <label>Categories:</label><br>
