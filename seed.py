@@ -17,7 +17,7 @@ def seed_database():
     cursor.execute("DELETE FROM events")
     cursor.execute("DELETE FROM users")
 
-    user_count = 1000
+    user_count = 1000*100
     event_count = 1000*1000
 
     password_hash = generate_password_hash("1234")
@@ -67,7 +67,8 @@ def seed_database():
                     (event_id, cat_id)
                 )
 
-        num_rsvps = random.randint(0, len(user_ids)//20)
+        max_rsvps = min(len(user_ids)//20, 50)
+        num_rsvps = random.randint(0, max_rsvps)
         sampled_users = random.sample(user_ids, num_rsvps)
         statuses = ["In", "Maybe", "Out"]
 
