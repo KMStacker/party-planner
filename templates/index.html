@@ -75,4 +75,16 @@
     <p>No events planned yet!</p>
   {% endif %}
 {% endif %}
+
+<div>
+  <p>
+    {% if page > 1 %}
+      <a href="/{{ page - 1 }}?{{ request.query_string.decode('utf-8') }}">&lt;&lt; Previous</a>
+    {% endif %}
+    <span>Page {{ page }} / {{ page_count }}</span>
+    {% if page < page_count %}
+      <a href="/{{ page + 1 }}?{{ request.query_string.decode('utf-8') }}">Next &gt;&gt;</a>
+    {% endif %}
+  </p>
+</div>
 {% endblock %}

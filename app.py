@@ -1,6 +1,7 @@
 import sqlite3
 import secrets
 import time
+import math
 from datetime import date, datetime
 from flask import Flask, render_template, request, redirect, flash, session, abort, g
 import config
@@ -52,16 +53,27 @@ def not_found_error(error):
 # ---------- Home and authentication routes ----------
 
 @app.route("/")
-def index():
+@app.route("/<int:page>")
+def index(page=1):
     keyword = request.args.get("keyword", "")
     category_id = request.args.get("category_id", "")
     start_date = request.args.get("start_date", "")
     end_date = request.args.get("end_date", "")
 
+    page_size = 20
+
     if keyword or category_id or start_date or end_date:
-        all_events = events.search_events(keyword, category_id, start_date, end_date)
+        total_count = events.get_search_count(keyword, category_id, start_date, end_date)
     else:
-        all_events = events.get_events()
+        total_count = events.get_event_count()
+
+    page_count = math.ceil(total_count / page_size)
+    page_count = max(page_count, 1)
+
+    if keyword or category_id or start_date or end_date:
+        all_events = events.search_events(keyword, category_id, start_date, end_date, page, page_size)
+    else:
+        all_events = events.get_events(page, page_size)
 
     all_categories = events.get_categories()
 
@@ -71,7 +83,9 @@ def index():
                            keyword=keyword,
                            selected_category=category_id,
                            start_date=start_date,
-                           end_date=end_date)
+                           end_date=end_date,
+                           page=page,
+                           page_count=page_count)
 
 @app.route("/register")
 def register():

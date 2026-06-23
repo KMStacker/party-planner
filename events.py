@@ -1,13 +1,20 @@
 import db
 
-def get_events():
+def get_events(page, page_size):
     sql = """
     SELECT events.id, events.user_id, events.title, events.event_date, events.end_date, users.username
     FROM events 
     JOIN users ON events.user_id = users.id 
     ORDER BY events.event_date ASC
+    LIMIT ? OFFSET ?
     """
-    return db.query(sql)
+    limit = page_size
+    offset = page_size * (page - 1)
+    return db.query(sql, [limit, offset])
+
+def get_event_count():
+    sql = "SELECT COUNT(*) AS count FROM events"
+    return db.query(sql)[0]["count"]
 
 def get_categories():
     sql = "SELECT id, name FROM categories ORDER BY name"
@@ -96,32 +103,55 @@ def delete_event(event_id):
     finally:
         con.close()
 
-def search_events(keyword, category_id, start_date, end_date):
+def search_events(keyword, category_id, start_date, end_date, page, page_size):
     sql = """
-    SELECT DISTINCT events.id, events.user_id, events.title, events.event_date, users.username
+    SELECT DISTINCT events.id, events.user_id, events.title, events.event_date, events.end_date, users.username
     FROM events
     JOIN users ON events.user_id = users.id
     LEFT JOIN event_categories ON events.id = event_categories.event_id
     WHERE 1=1
     """
     params = []
-
     if keyword:
         sql += " AND (events.title LIKE ? OR events.description LIKE ?)"
         params.append(f"%{keyword}%")
         params.append(f"%{keyword}%")
-
     if category_id:
         sql += " AND event_categories.category_id = ?"
         params.append(category_id)
-
     if start_date:
         sql += " AND events.event_date >= ?"
         params.append(start_date)
-
     if end_date:
         sql += " AND events.event_date <= ?"
         params.append(end_date)
-
-    sql += " ORDER BY events.event_date ASC"
+    sql += " ORDER BY events.event_date ASC LIMIT ? OFFSET ?"
+    limit = page_size
+    offset = page_size * (page - 1)
+    params.append(limit)
+    params.append(offset)
     return db.query(sql, params)
+
+def get_search_count(keyword, category_id, start_date, end_date):
+    sql = """
+    SELECT COUNT(DISTINCT events.id) AS count
+    FROM events
+    JOIN users ON events.user_id = users.id
+    LEFT JOIN event_categories ON events.id = event_categories.event_id
+    WHERE 1=1
+    """
+    params = []
+    if keyword:
+        sql += " AND (events.title LIKE ? OR events.description LIKE ?)"
+        params.append(f"%{keyword}%")
+        params.append(f"%{keyword}%")
+    if category_id:
+        sql += " AND event_categories.category_id = ?"
+        params.append(category_id)
+    if start_date:
+        sql += " AND events.event_date >= ?"
+        params.append(start_date)
+    if end_date:
+        sql += " AND events.end_date <= ?"
+        params.append(end_date)
+    return db.query(sql, params)[0]["count"]
