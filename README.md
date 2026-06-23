@@ -50,3 +50,22 @@ Sen jälkeen voit tarkastaa koodin laadun komennolla:
 ```
 $ pylint *.py
 ```
+
+## Suuren tietomäärän käsittely
+
+Sovelluksen toimintaa testattiin suurella tietomäärällä käyttäen erillistä `test_database.db`-tiedostoa, jonka sisältö generoitiin erillisellä `seed.py`-skriptillä.
+
+### Testidata lukuina (`seed.py`)
+* **Käyttäjät (Users):** 100 000 kappaletta
+* **Tapahtumat (Events):** 1 000 000 kappaletta (jokaisessa 0–7 kategoriaa ja osa monipäiväisiä tapahtumia)
+* **Ilmottautumiset (RSVP):** 0–50 kappaletta (per tapahtuma)
+
+### Mittaustulokset (Etusivu - Home)
+Etusivun latausaikaa mitattiin palvelimen lokista kolmessa eri vaiheessa seuraavin tuloksin:
+
+1. **Ilman sivutusta ja indeksejä:** `19.47 s`
+   * Sivu jumiutu yrittäessään näyttää jokaisen tapahtuman samalla sivulla.
+2. **Sivutuksen kanssa (ei indeksejä):** `3.52 s`
+   * Lataus nopeutui huomattavasti eikä sivu mennyt jumiin, viiveen ollessa kuitenkin havaittava.
+3. **Sivutuksen ja indeksien kanssa:** `0.01 s`
+   * Sivu latautui välittömästi ilman havaittavaa viivettä.
