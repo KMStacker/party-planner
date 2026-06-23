@@ -48,3 +48,7 @@ CREATE TABLE user_availability (
     date_status TEXT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
+
+CREATE INDEX idx_events_event_date ON events (event_date);
+CREATE INDEX idx_events_user_id ON events (user_id);
+CREATE INDEX idx_rsvps_event_id ON rsvps (event_id);
