@@ -427,14 +427,40 @@ def profile_add_date():
     if errors:
         for error in errors:
             flash(error, "error")
-        return redirect("/user/" + str(session["user_id"]))
+        user = users.get_user_profile(session["user_id"])
+        stats = users.get_user_stats(session["user_id"])
+        user_events = users.get_user_events(session["user_id"])
+        user_dates = users.get_user_dates(session["user_id"])
+        return render_template(
+            "profile.html",
+            user=user,
+            stats=stats,
+            user_events=user_events,
+            user_dates=user_dates,
+            start_date_string=start_date_string,
+            end_date_string=end_date_string,
+            date_status=date_status
+        )
 
     end_date_string = end_date_string if end_date_string else start_date_string
 
     if users.overlapping_date_status(session["user_id"], start_date_string, end_date_string):
         flash("The new date range overlaps with an existing one. Please adjust the dates.", "error")
-        return redirect("/user/" + str(session["user_id"]))
-
+        user = users.get_user_profile(session["user_id"])
+        stats = users.get_user_stats(session["user_id"])
+        user_events = users.get_user_events(session["user_id"])
+        user_dates = users.get_user_dates(session["user_id"])
+        return render_template(
+            "profile.html",
+            user=user,
+            stats=stats,
+            user_events=user_events,
+            user_dates=user_dates,
+            start_date_string=start_date_string,
+            end_date_string=end_date_string,
+            date_status=date_status
+        )
+    
     users.add_user_availability(session["user_id"], start_date_string, end_date_string, date_status)
     flash("Availability date added successfully!", "success")
     return redirect("/user/" + str(session["user_id"]))

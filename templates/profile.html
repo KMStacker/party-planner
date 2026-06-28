@@ -86,13 +86,13 @@
     <h4 style="margin-top: 20px; margin-bottom: 5px;">Add Availability Date:</h4>
     <form action="/profile/add_date" method="post" class="inline-form">
       <label for="start_date_input">Start Date</label>
-      <input type="date" name="start_date_string" id="start_date_input">
+      <input type="date" name="start_date_string" id="start_date_input" value="{{ start_date_string or '' }}">
       <label for="end_date_input">End Date</label>
-      <input type="date" name="end_date_string" id="end_date_input">
+      <input type="date" name="end_date_string" id="end_date_input" value="{{ end_date_string or '' }}">
       <label for="date_status_select">Status</label>
       <select name="date_status" id="date_status_select">
-        <option value="Available">Available</option>
-        <option value="Unavailable">Unavailable</option>
+        <option value="Available" {% if date_status == 'Available' %}selected{% endif %}>Available</option>
+        <option value="Unavailable" {% if date_status == 'Unavailable' %}selected{% endif %}>Unavailable</option>
       </select>
       <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
       <input type="submit" class="btn btn-primary" value="Add" style="padding: 8px 15px;">
