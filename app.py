@@ -197,9 +197,6 @@ def create_event():
 
     errors = []
 
-    if not end_date:
-        end_date = event_date
-
     if not title:
         errors.append("Title cannot be empty or contain only spaces")
     if not description:
@@ -231,6 +228,9 @@ def create_event():
             end_date=end_date,
             event_category_ids=int_category_ids
         )
+
+    if not end_date:
+        end_date = event_date
 
     events.create_event(session["user_id"], title, description, event_date, end_date, int_category_ids)
     return redirect("/")
@@ -291,9 +291,6 @@ def update_event(event_id):
 
     errors = []
 
-    if not end_date:
-        end_date = event_date
-
     if not title:
         errors.append("Title cannot be empty or contain only spaces")
     if not description:
@@ -329,6 +326,9 @@ def update_event(event_id):
             categories=categories,
             event_category_ids=int_category_ids
         )
+
+    if not end_date:
+        end_date = event_date
 
     events.update_event(event_id, title, description, event_date, end_date, int_category_ids)
     return redirect("/event/" + str(event_id))
