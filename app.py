@@ -226,8 +226,7 @@ def create_event():
             event_category_ids=int_category_ids
         )
 
-    events.create_event(session["user_id"], title, description, event_date, end_date, category_ids)
-
+    events.create_event(session["user_id"], title, description, event_date, end_date, int_category_ids)
     return redirect("/")
 
 @app.route("/event/<int:event_id>")
@@ -325,7 +324,7 @@ def update_event(event_id):
             event_category_ids=int_category_ids
         )
 
-    events.update_event(event_id, title, description, event_date, end_date, category_ids)
+    events.update_event(event_id, title, description, event_date, end_date, int_category_ids)
     return redirect("/event/" + str(event_id))
 
 @app.route("/event/<int:event_id>/delete", methods=["POST"])
