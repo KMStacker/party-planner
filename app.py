@@ -343,6 +343,7 @@ def delete_event(event_id):
     require_owner(event)
 
     events.delete_event(event_id)
+    flash("Event deleted successfully!", "success")
     return redirect("/")
 
 
@@ -382,7 +383,7 @@ def profile_status():
         return redirect("/user/" + str(session["user_id"]))
 
     users.update_status(session["user_id"], status)
-
+    flash("Status updated successfully!", "success")
     return redirect("/user/" + str(session["user_id"]))
 
 @app.route("/profile/delete_status", methods=["POST"])
@@ -391,6 +392,7 @@ def profile_delete_status():
     check_csrf()
 
     users.update_status(session["user_id"], None)
+    flash("Status cleared successfully!", "success")
     return redirect("/user/" + str(session["user_id"]))
 
 @app.route("/profile/add_date", methods=["POST"])
@@ -434,6 +436,7 @@ def profile_add_date():
         return redirect("/user/" + str(session["user_id"]))
 
     users.add_user_availability(session["user_id"], start_date_string, end_date_string, date_status)
+    flash("Availability date added successfully!", "success")
     return redirect("/user/" + str(session["user_id"]))
 
 @app.route("/profile/delete_date/<int:date_id>", methods=["POST"])
@@ -442,6 +445,7 @@ def profile_delete_date(date_id):
     check_csrf()
 
     users.delete_user_date(date_id, session["user_id"])
+    flash("Availability date deleted successfully!", "success")
     return redirect("/user/" + str(session["user_id"]))
 
 
