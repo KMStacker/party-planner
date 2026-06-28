@@ -13,7 +13,7 @@
             
             {% if session.user_id %}
                 <a href="/event/new">New Event</a> |
-                <a href="/user/{{ session.user_id }}">{{ icons.user() }} My Profile ({{ session.username }})</a> |
+                <a href="/user/{{ session.user_id }}" class="icon-row">{{ icons.user() }} My Profile ({{ session.username }})</a> |
                 <a href="/logout">Logout</a>
             {% else %}
                 <a href="/login">Login</a> | 

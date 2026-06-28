@@ -21,6 +21,12 @@ header h1 {
     margin: 0 0 10px 0;
 }
 
+nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 nav a {
     color: #ecf0f1;
     text-decoration: none;
