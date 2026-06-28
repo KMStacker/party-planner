@@ -446,7 +446,11 @@ def rsvp():
     check_csrf()
 
     event_id = request.form["event_id"]
-    rsvp_status = request.form["rsvp_status"]
+    rsvp_status = request.form["rsvp_status", ""]
+
+    if rsvp_status not in ["In", "Maybe", "Out"]:
+        flash("Invalid RSVP status", "error")
+        return redirect("/event/" + str(event_id))
 
     events.add_rsvp(event_id, session["user_id"], rsvp_status)
 
