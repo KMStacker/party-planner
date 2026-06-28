@@ -72,7 +72,7 @@
           {% if session.user_id == user.id %}
             <form action="/profile/delete_date/{{ d.id }}" method="post" style="margin: 0;">
               <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-              <input type="submit" value="×" class="btn-delete-x">
+              <input type="submit" value="x" class="btn-delete-x">
             </form>
           {% endif %}
         </li>
