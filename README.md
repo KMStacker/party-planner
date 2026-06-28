@@ -53,7 +53,7 @@ Jos haluat tarkistaa koodin laadun Pylint-työkalulla, asenna se ensin komennoll
 $ pip install pylint
 ```
 
-Sen jälkeen voit tarkastaa koodin laadun komennolla:
+Tämän jälkeen voit tarkastaa koodin laadun komennolla:
 
 ```
 $ pylint *.py
