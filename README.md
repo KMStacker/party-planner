@@ -18,6 +18,14 @@ Tässä pääasiallinen tietokohde on tapahtuma ja toissijainen tietokohde on il
 
 ## Sovelluksen asennus
 
+Kloonaa sovellus omalle koneellesi komennolla:
+
+```
+$ git clone git@github.com:KMStacker/party-planner.git
+```
+
+Tämän jälkeen voit siirtyä kloonaamasi sovelluksen hakemistoon komennon ```cd``` avulla, ja noudattaa seuraavia asennusohjeita:
+
 Asenna `flask`-kirjasto:
 
 ```

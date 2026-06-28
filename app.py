@@ -451,7 +451,7 @@ def rsvp():
     check_csrf()
 
     event_id = request.form["event_id"]
-    rsvp_status = request.form["rsvp_status", ""]
+    rsvp_status = request.form.get("rsvp_status", "")
 
     if rsvp_status not in ["In", "Maybe", "Out"]:
         flash("Invalid RSVP status", "error")
