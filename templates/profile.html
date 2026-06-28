@@ -23,12 +23,12 @@
         <label for="status_input" style="display: none;">Status</label>
         <input type="text" name="status" id="status_input" placeholder="Type your desires here and update your status::" style="min-width: 300px;">
         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-        <input type="submit" class="btn btn-clear" value="Update Status" style="padding: 8px 15px;">
+        <input type="submit" class="btn btn-primary" value="Update Status" style="padding: 8px 15px;">
       </form>
       {% if user.status %}
         <form action="/profile/delete_status" method="post" style="margin: 0;">
           <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-          <input type="submit" class="btn btn-primary" value="Clear Status" style="padding: 8px 15px; margin-left: 10px;"
+          <input type="submit" class="btn btn-clear" value="Clear Status" style="padding: 8px 15px; margin-left: 10px;"
             onclick="return confirm('Are you sure you want to clear your status?');">
         </form>
       {% endif %}
