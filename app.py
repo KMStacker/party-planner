@@ -233,6 +233,7 @@ def create_event():
         end_date = event_date
 
     events.create_event(session["user_id"], title, description, event_date, end_date, int_category_ids)
+    flash("Event created successfully!", "success")
     return redirect("/")
 
 @app.route("/event/<int:event_id>")
@@ -331,6 +332,7 @@ def update_event(event_id):
         end_date = event_date
 
     events.update_event(event_id, title, description, event_date, end_date, int_category_ids)
+    flash("Event updated successfully!", "success")
     return redirect("/event/" + str(event_id))
 
 @app.route("/event/<int:event_id>/delete", methods=["POST"])
