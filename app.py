@@ -104,10 +104,13 @@ def index(page=1):
 
 @app.route("/register")
 def register():
+    if "csrf_token" not in session:
+        session["csrf_token"] = secrets.token_hex(16)
     return render_template("register.html")
 
 @app.route("/create_account", methods=["POST"])
 def create_account():
+    check_csrf()
     username = request.form["username"].strip()
     password1 = request.form["password1"]
     password2 = request.form["password2"]
@@ -141,8 +144,11 @@ def create_account():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
+        if "csrf_token" not in session:
+            session["csrf_token"] = secrets.token_hex(16)
         return render_template("login.html")
 
+    check_csrf()
     username = request.form["username"].strip()
     password = request.form["password"]
 
