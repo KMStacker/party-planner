@@ -152,6 +152,6 @@ def get_search_count(keyword, category_id, start_date, end_date):
         sql += " AND events.event_date >= ?"
         params.append(start_date)
     if end_date:
-        sql += " AND events.end_date <= ?"
+        sql += " AND events.event_date <= ?"
         params.append(end_date)
     return db.query(sql, params)[0]["count"]
