@@ -25,7 +25,8 @@ def create_event(user_id, title, description, event_date, end_date, category_ids
     try:
         with con:
             event_id = con.execute(
-                "INSERT INTO events (user_id, title, description, event_date, end_date) VALUES (?, ?, ?, ?, ?)",
+                "INSERT INTO events (user_id, title, description, event_date, end_date) "
+                "VALUES (?, ?, ?, ?, ?)",
                 [user_id, title, description, event_date, end_date]
             ).lastrowid
 
@@ -83,7 +84,8 @@ def update_event(event_id, title, description, event_date, end_date, category_id
     try:
         with con:
             con.execute(
-                "UPDATE events SET title = ?, description = ?, event_date = ?, end_date = ? WHERE id = ?",
+                "UPDATE events SET title = ?, description = ?, event_date = ?, end_date = ? "
+                "WHERE id = ?",
                 [title, description, event_date, end_date, event_id]
             )
             con.execute("DELETE FROM event_categories WHERE event_id = ?", [event_id])

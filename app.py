@@ -42,12 +42,20 @@ def after_request(response):
 # ---------- Error handlers ----------
 
 @app.errorhandler(403)
-def forbidden_error(error):
-    return render_template("error.html", title="403 - Forbidden", message="You do not have permission to access this page."), 403
+def forbidden_error(_error):
+    return render_template(
+        "error.html",
+        title="403 - Forbidden",
+        message="You do not have permission to access this page."
+    ), 403
 
 @app.errorhandler(404)
-def not_found_error(error):
-    return render_template("error.html", title="404 - Not Found", message="The page you are looking for does not exist."), 404
+def not_found_error(_error):
+    return render_template(
+        "error.html",
+        title="404 - Not Found",
+        message="The page you are looking for does not exist."
+    ), 404
 
 
 # ---------- Home and authentication routes ----------
@@ -71,7 +79,14 @@ def index(page=1):
     page_count = max(page_count, 1)
 
     if keyword or category_id or start_date or end_date:
-        all_events = events.search_events(keyword, category_id, start_date, end_date, page, page_size)
+        all_events = events.search_events(
+            keyword,
+            category_id,
+            start_date,
+            end_date,
+            page,
+            page_size
+        )
     else:
         all_events = events.get_events(page, page_size)
 
@@ -105,7 +120,7 @@ def create_account():
 
     if not password1:
         errors.append("Password cannot be empty")
-    
+
     if password1 != password2:
         errors.append("Passwords do not match")
 
@@ -196,7 +211,7 @@ def create_event():
 
     if event_date and end_date and event_date > end_date:
         errors.append("Event end date cannot be before start date")
-  
+
     if errors:
         for error in errors:
             flash(error, "error")
@@ -228,7 +243,13 @@ def show_event(event_id):
     if "user_id" in session:
         user_rsvp = events.get_user_rsvp(event_id, session["user_id"])
 
-    return render_template("event.html", event=event, categories=categories, rsvps=rsvps, user_rsvp=user_rsvp)
+    return render_template(
+        "event.html",
+        event=event,
+        categories=categories,
+        rsvps=rsvps,
+        user_rsvp=user_rsvp
+    )
 
 @app.route("/event/<int:event_id>/edit")
 def edit_event(event_id):
@@ -262,7 +283,7 @@ def update_event(event_id):
     category_ids = list(set(request.form.getlist("categories")))
     today = date.today().isoformat()
     int_category_ids = [int(cid) for cid in category_ids if cid.isdigit()]
-    
+
     errors = []
 
     if not end_date:
@@ -285,7 +306,7 @@ def update_event(event_id):
 
     if event_date and end_date and event_date > end_date:
         errors.append("Event end date cannot be before start date")
-  
+
     if errors:
         for error in errors:
             flash(error, "error")
@@ -374,6 +395,8 @@ def profile_add_date():
     end_date_string = request.form["end_date_string"]
     date_status = request.form["date_status"]
     errors = []
+    start_date = None
+    end_date = None
 
     if not start_date_string:
         errors.append("Start date cannot be empty")
